@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides">
+  <n-config-provider :theme="naiveTheme" :theme-overrides="currentThemeOverrides">
     <n-message-provider>
       <n-layout has-sider style="height: 100vh">
         <n-layout-sider
@@ -37,6 +37,15 @@
               <span class="header-badge" v-if="store.loading">更新中...</span>
             </div>
             <div class="header-right">
+              <!-- 主题切换 -->
+              <n-button quaternary circle size="small" @click="themeStore.toggle" class="theme-toggle-btn">
+                <template #icon>
+                  <n-icon size="18">
+                    <SunnyOutline v-if="themeStore.isDark" />
+                    <MoonOutline v-else />
+                  </n-icon>
+                </template>
+              </n-button>
               <!-- 未登录 -->
               <template v-if="!authStore.isAuthenticated">
                 <n-button size="small" type="primary" ghost @click="showAuthDialog = true" class="login-btn">
@@ -98,21 +107,92 @@ import {
   PersonOutline,
   LockClosedOutline,
   ChevronDownOutline,
+  SunnyOutline,
+  MoonOutline,
 } from "@vicons/ionicons5";
 import router from "./router";
 import { useGoldStore } from "./stores/gold";
 import { useAuthStore } from "./stores/auth";
+import { useThemeStore } from "./stores/theme";
 import AuthDialog from "./components/AuthDialog.vue";
 
 const route = useRoute();
 const goldStore = useGoldStore();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 const store = goldStore;
 const activeKey = ref<string>("gold");
 const collapsed = ref(false);
 const currentTime = ref("");
 const showAuthDialog = ref(false);
 let timer: ReturnType<typeof setInterval> | null = null;
+
+// ── Naive UI 主题 ──
+const naiveTheme = computed(() => themeStore.isDark ? darkTheme : null);
+
+const darkThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: "#d4a843",
+    primaryColorHover: "#e8c46a",
+    primaryColorPressed: "#b8922e",
+    borderRadius: "10px",
+    fontSize: "14px",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  Card: {
+    color: "#1a2332",
+    borderColor: "rgba(255,255,255,0.06)",
+    borderRadius: "12px",
+  },
+  Menu: {
+    itemTextColor: "#a0aec0",
+    itemTextColorHover: "#d4a843",
+    itemTextColorActive: "#e8c46a",
+    itemIconColor: "#636e80",
+    itemIconColorHover: "#d4a843",
+    itemIconColorActive: "#e8c46a",
+    itemColorActive: "rgba(212, 168, 67, 0.08)",
+    itemColorActiveHover: "rgba(212, 168, 67, 0.12)",
+    itemHeight: "44px",
+  },
+  Button: { borderRadiusMedium: "8px" },
+  Tag: { borderRadius: "6px" },
+  DataTable: { borderRadius: "12px" },
+};
+
+const lightThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: "#b8922e",
+    primaryColorHover: "#d4a843",
+    primaryColorPressed: "#9a7a20",
+    borderRadius: "10px",
+    fontSize: "14px",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  },
+  Card: {
+    color: "#ffffff",
+    borderColor: "rgba(0,0,0,0.08)",
+    borderRadius: "12px",
+  },
+  Menu: {
+    itemTextColor: "#4a5568",
+    itemTextColorHover: "#b8922e",
+    itemTextColorActive: "#9a7a20",
+    itemIconColor: "#a0aec0",
+    itemIconColorHover: "#b8922e",
+    itemIconColorActive: "#9a7a20",
+    itemColorActive: "rgba(184, 146, 46, 0.08)",
+    itemColorActiveHover: "rgba(184, 146, 46, 0.12)",
+    itemHeight: "44px",
+  },
+  Button: { borderRadiusMedium: "8px" },
+  Tag: { borderRadius: "6px" },
+  DataTable: { borderRadius: "12px" },
+};
+
+const currentThemeOverrides = computed(() =>
+  themeStore.isDark ? darkThemeOverrides : lightThemeOverrides
+);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderIcon = (icon: any) => () =>
@@ -190,7 +270,6 @@ watch(activeKey, (key) => {
   }
 });
 
-// 检测路由 query 中的 auth=required，自动弹出登录框
 watch(
   () => route.query.auth,
   (auth) => {
@@ -201,7 +280,6 @@ watch(
   { immediate: true }
 );
 
-// 登录成功后跳转到之前想访问的页面
 watch(
   () => authStore.isAuthenticated,
   (isAuth) => {
@@ -214,45 +292,10 @@ watch(
   }
 );
 
-const themeOverrides: GlobalThemeOverrides = {
-  common: {
-    primaryColor: "#d4a843",
-    primaryColorHover: "#e8c46a",
-    primaryColorPressed: "#b8922e",
-    borderRadius: "10px",
-    fontSize: "14px",
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-  },
-  Card: {
-    color: "#1a2332",
-    borderColor: "rgba(255,255,255,0.06)",
-    borderRadius: "12px",
-  },
-  Menu: {
-    itemTextColor: "#a0aec0",
-    itemTextColorHover: "#d4a843",
-    itemTextColorActive: "#e8c46a",
-    itemIconColor: "#636e80",
-    itemIconColorHover: "#d4a843",
-    itemIconColorActive: "#e8c46a",
-    itemColorActive: "rgba(212, 168, 67, 0.08)",
-    itemColorActiveHover: "rgba(212, 168, 67, 0.12)",
-    itemHeight: "44px",
-  },
-  Button: {
-    borderRadiusMedium: "8px",
-  },
-  Tag: {
-    borderRadius: "6px",
-  },
-  DataTable: {
-    borderRadius: "12px",
-  },
-};
-
 onMounted(async () => {
   updateTime();
   timer = setInterval(updateTime, 1000);
+  themeStore.init();
   await authStore.checkAuth();
 });
 
@@ -264,7 +307,8 @@ onUnmounted(() => {
 <style scoped>
 .app-sidebar {
   background: var(--bg-sidebar) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid var(--sidebar-border);
+  transition: background 0.3s ease;
 }
 
 .logo-area {
@@ -318,11 +362,13 @@ onUnmounted(() => {
 .sidebar-divider {
   height: 1px;
   margin: 0 16px 8px;
-  background: linear-gradient(90deg, rgba(212,168,67,0.3) 0%, rgba(255,255,255,0.04) 100%);
+  background: linear-gradient(90deg, var(--gold-primary) 0%, var(--border-subtle) 100%);
+  opacity: 0.4;
 }
 
 .app-main {
   background: var(--bg-primary);
+  transition: background 0.3s ease;
 }
 
 .app-header {
@@ -334,6 +380,7 @@ onUnmounted(() => {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   backdrop-filter: blur(10px);
+  transition: background 0.3s ease;
 }
 
 .header-left {
@@ -362,6 +409,15 @@ onUnmounted(() => {
   gap: 16px;
 }
 
+.theme-toggle-btn {
+  color: var(--text-muted) !important;
+  transition: color 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--gold-primary) !important;
+}
+
 .login-btn {
   font-size: 13px;
 }
@@ -377,12 +433,12 @@ onUnmounted(() => {
 }
 
 .user-area:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--user-hover-bg);
 }
 
 .user-avatar-default {
   background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)) !important;
-  color: #0a0e1a !important;
+  color: #fff !important;
   font-weight: 700;
   font-size: 13px;
 }
@@ -407,5 +463,6 @@ onUnmounted(() => {
   height: calc(100vh - 52px);
   background: var(--bg-primary);
   overflow-y: auto;
+  transition: background 0.3s ease;
 }
 </style>

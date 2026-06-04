@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
 
-:root {
+/* ── 深色主题 (默认) ── */
+:root,
+[data-theme="dark"] {
   --bg-primary: #0a0e1a;
   --bg-secondary: #111827;
   --bg-card: #1a2332;
@@ -21,6 +23,38 @@
   --color-flat: #9ca3af;
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
   --shadow-glow-gold: 0 0 20px rgba(212, 168, 67, 0.15);
+  --scrollbar-thumb: rgba(212, 168, 67, 0.3);
+  --scrollbar-thumb-hover: rgba(212, 168, 67, 0.5);
+  --sidebar-border: rgba(255, 255, 255, 0.04);
+  --user-hover-bg: rgba(255, 255, 255, 0.06);
+}
+
+/* ── 浅色主题 ── */
+[data-theme="light"] {
+  --bg-primary: #f5f6fa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f1f5;
+  --bg-sidebar: #f9fafb;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(180, 140, 40, 0.25);
+  --gold-primary: #b8922e;
+  --gold-light: #d4a843;
+  --gold-dark: #9a7a20;
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #a0aec0;
+  --color-up: #dc2626;
+  --color-up-bg: rgba(220, 38, 38, 0.08);
+  --color-down: #16a34a;
+  --color-down-bg: rgba(22, 163, 74, 0.08);
+  --color-flat: #9ca3af;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-glow-gold: 0 0 12px rgba(180, 140, 40, 0.1);
+  --scrollbar-thumb: rgba(180, 140, 40, 0.25);
+  --scrollbar-thumb-hover: rgba(180, 140, 40, 0.4);
+  --sidebar-border: rgba(0, 0, 0, 0.06);
+  --user-hover-bg: rgba(0, 0, 0, 0.04);
 }
 
 * {
@@ -36,6 +70,7 @@ html, body, #app {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 ::-webkit-scrollbar {
@@ -48,12 +83,12 @@ html, body, #app {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 168, 67, 0.3);
+  background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 168, 67, 0.5);
+  background: var(--scrollbar-thumb-hover);
 }
 
 .price-up {
