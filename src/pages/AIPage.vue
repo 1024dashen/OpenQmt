@@ -140,7 +140,12 @@ function generateAIResponse(question: string): string {
 <style scoped>
 .ai-page {
   max-width: 900px;
-  height: calc(100vh - 100px);
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-container {
@@ -157,6 +162,13 @@ function generateAIResponse(question: string): string {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .chat-messages {
+    padding: 16px;
+  }
 }
 
 .welcome-area {
@@ -243,6 +255,30 @@ function generateAIResponse(question: string): string {
 
 .bubble-body {
   max-width: 68%;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .bubble-body {
+    max-width: 82%;
+  }
+
+  .welcome-area {
+    padding: 30px 12px 20px;
+  }
+
+  .welcome-title {
+    font-size: 18px;
+  }
+
+  .quick-item {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .chat-input {
+    padding: 10px 12px;
+  }
 }
 
 .bubble-user .bubble-body {

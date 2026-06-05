@@ -18,15 +18,18 @@
     </div>
 
     <n-spin :show="store.loading">
-      <n-data-table
-        :columns="columns"
-        :data="store.data"
-        :bordered="false"
-        size="small"
-        :row-class-name="rowClassName"
-        :pagination="pagination"
-        class="fund-table"
-      />
+      <div class="table-scroll-wrap">
+        <n-data-table
+          :columns="columns"
+          :data="store.data"
+          :bordered="false"
+          size="small"
+          :scroll-x="860"
+          :row-class-name="rowClassName"
+          :pagination="pagination"
+          class="fund-table"
+        />
+      </div>
     </n-spin>
   </div>
 </template>
@@ -175,18 +178,8 @@ onMounted(() => { refreshData(); });
 <style scoped>
 .fund-page {
   max-width: 1400px;
-}
-
-.page-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.update-time {
-  color: var(--text-muted);
-  font-size: 13px;
+  width: 100%;
+  min-width: 0;
 }
 
 .fund-table {

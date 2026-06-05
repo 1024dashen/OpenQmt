@@ -258,11 +258,19 @@ function resetForms() {
 <style scoped>
 .auth-dialog {
   width: 420px;
+  max-width: calc(100vw - 32px);
   background: var(--bg-card);
   border-radius: 16px;
   padding: 32px 36px 24px;
   box-shadow: var(--shadow-card), var(--shadow-glow-gold);
   border: 1px solid var(--border-accent);
+}
+
+@media (max-width: 480px) {
+  .auth-dialog {
+    padding: 24px 20px 20px;
+    border-radius: 14px;
+  }
 }
 
 .auth-header {

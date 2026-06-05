@@ -4,7 +4,7 @@
       <h2 class="intro-title">技术指标学习</h2>
       <p class="intro-desc">掌握核心技术分析工具，提升投资决策能力</p>
     </div>
-    <n-grid :cols="2" :x-gap="14" :y-gap="14">
+    <n-grid :cols="gridCols" :x-gap="14" :y-gap="14">
       <n-gi v-for="topic in topics" :key="topic.id">
         <div class="learn-card" :class="`level-${topic.level}`" @click="selectTopic(topic)">
           <div class="learn-card-inner">
@@ -19,7 +19,14 @@
       </n-gi>
     </n-grid>
 
-    <n-modal v-model:show="showModal" preset="card" :title="currentTopic?.title" style="width: 700px; max-height: 80vh" :bordered="false">
+    <n-modal
+      v-model:show="showModal"
+      preset="card"
+      :title="currentTopic?.title"
+      class="learn-modal"
+      :style="{ width: modalWidth, maxHeight: '80vh' }"
+      :bordered="false"
+    >
       <div class="modal-content" v-if="currentTopic">
         <span class="modal-level" :class="`badge-${currentTopic.level}`">{{ currentTopic.level }}</span>
         <div class="topic-detail" v-html="currentTopic.detail"></div>
@@ -29,9 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import type { LearnTopic } from "../types";
+import { useBreakpoint } from "../composables/useBreakpoint";
 
+const { isMobile } = useBreakpoint();
+const gridCols = computed(() => (isMobile.value ? 1 : 2));
+const modalWidth = computed(() => (isMobile.value ? "calc(100vw - 32px)" : "700px"));
 const showModal = ref(false);
 const currentTopic = ref<LearnTopic | null>(null);
 
@@ -67,6 +78,18 @@ const topics: LearnTopic[] = [
 <style scoped>
 .learn-page {
   max-width: 1200px;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .learn-card-header {
+    flex-wrap: wrap;
+  }
+
+  .topic-title {
+    min-width: 0;
+  }
 }
 
 .page-intro {

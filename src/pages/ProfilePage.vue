@@ -248,6 +248,8 @@ async function handleUpdatePassword() {
 <style scoped>
 .profile-page {
   max-width: 960px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
 }
 
@@ -466,6 +468,25 @@ async function handleUpdatePassword() {
   .profile-header {
     flex-direction: column;
     text-align: center;
+    padding: 20px 16px;
+  }
+  .profile-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .recharge-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .credits-value {
+    font-size: 36px;
+  }
+
+  .profile-name {
+    font-size: 18px;
   }
 }
 </style>

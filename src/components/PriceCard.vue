@@ -242,4 +242,18 @@ function formatVolume(val: number): string {
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 14px 16px 12px;
+  }
+
+  .card-price {
+    font-size: 26px;
+  }
+
+  .card-header {
+    margin-bottom: 10px;
+  }
+}
 </style>

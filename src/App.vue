@@ -1,8 +1,10 @@
 <template>
   <n-config-provider :theme="naiveTheme" :theme-overrides="currentThemeOverrides">
     <n-message-provider>
-      <n-layout has-sider style="height: 100vh">
+      <n-layout :has-sider="!isMobile" style="height: 100vh">
         <n-layout-sider
+          v-if="!isMobile"
+          v-model:collapsed="collapsed"
           collapse-mode="width"
           :collapsed-width="64"
           :width="220"
@@ -27,17 +29,28 @@
             :collapsed-icon-size="20"
             :options="menuOptions"
             :indent="20"
-            @update:collapsed="collapsed = $event"
           />
         </n-layout-sider>
         <n-layout class="app-main">
           <n-layout-header :bordered="false" class="app-header">
             <div class="header-left">
+              <n-button
+                v-if="isMobile"
+                quaternary
+                circle
+                size="small"
+                class="menu-toggle-btn"
+                @click="mobileSidebarOpen = true"
+              >
+                <template #icon>
+                  <n-icon size="20"><MenuOutline /></n-icon>
+                </template>
+              </n-button>
               <span class="header-title">{{ currentTitle }}</span>
               <span class="header-badge" v-if="store.loading">更新中...</span>
             </div>
             <div class="header-right">
-              <span class="header-time">{{ currentTime }}</span>
+              <span class="header-time" :class="{ 'header-time--compact': isMobile }">{{ currentTime }}</span>
               <!-- 主题切换 -->
               <n-button quaternary circle size="small" @click="themeStore.toggle" class="theme-toggle-btn">
                 <template #icon>
@@ -69,21 +82,44 @@
                     <n-avatar v-else :size="28" round class="user-avatar-default">
                       {{ authStore.user?.nickname?.charAt(0)?.toUpperCase() || 'U' }}
                     </n-avatar>
-                    <span class="user-name">{{ authStore.user?.nickname || authStore.user?.email }}</span>
+                    <span class="user-name" v-if="!isMobile">{{ authStore.user?.nickname || authStore.user?.email }}</span>
                     <n-icon size="14" color="var(--text-muted)"><ChevronDownOutline /></n-icon>
                   </div>
                 </n-dropdown>
               </template>
             </div>
           </n-layout-header>
-          <n-layout-content
-            content-style="padding: 24px 28px;"
-            class="app-content"
-          >
+          <n-layout-content class="app-content">
             <router-view />
           </n-layout-content>
         </n-layout>
       </n-layout>
+
+      <!-- 移动端侧栏抽屉 -->
+      <n-drawer
+        v-model:show="mobileSidebarOpen"
+        :width="260"
+        placement="left"
+        class="mobile-sidebar-drawer"
+      >
+        <div class="mobile-drawer-inner">
+          <div class="logo-area">
+            <div class="logo-icon-wrap">
+              <span class="logo-letter">Q</span>
+            </div>
+            <div class="logo-text-wrap">
+              <span class="logo-text">OpenQmt</span>
+              <span class="logo-sub">金融信息平台</span>
+            </div>
+          </div>
+          <div class="sidebar-divider"></div>
+          <n-menu
+            v-model:value="activeKey"
+            :options="menuOptions"
+            :indent="20"
+          />
+        </div>
+      </n-drawer>
 
       <!-- 登录/注册对话框 -->
       <AuthDialog v-model:show="showAuthDialog" />
@@ -109,8 +145,10 @@ import {
   ChevronDownOutline,
   SunnyOutline,
   MoonOutline,
+  MenuOutline,
 } from "@vicons/ionicons5";
 import router from "./router";
+import { useBreakpoint } from "./composables/useBreakpoint";
 import { useGoldStore } from "./stores/gold";
 import { useAuthStore } from "./stores/auth";
 import { useThemeStore } from "./stores/theme";
@@ -121,8 +159,10 @@ const goldStore = useGoldStore();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const store = goldStore;
+const { isMobile } = useBreakpoint();
 const activeKey = ref<string>("gold");
 const collapsed = ref(false);
+const mobileSidebarOpen = ref(false);
 const currentTime = ref("");
 const showAuthDialog = ref(false);
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -268,6 +308,9 @@ watch(activeKey, (key) => {
   if (route.path !== `/${key}`) {
     router.push(`/${key}`);
   }
+  if (isMobile.value) {
+    mobileSidebarOpen.value = false;
+  }
 });
 
 watch(
@@ -369,30 +412,54 @@ onUnmounted(() => {
 .app-main {
   background: var(--bg-primary);
   transition: background 0.3s ease;
+  min-width: 0;
+  flex: 1 1 0;
 }
 
 .app-header {
-  height: 52px;
-  padding: 0 28px;
+  height: var(--header-height);
+  padding: var(--header-padding);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
   backdrop-filter: blur(10px);
   transition: background 0.3s ease;
+  min-width: 0;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.menu-toggle-btn {
+  color: var(--text-muted) !important;
+  flex-shrink: 0;
+}
+
+.menu-toggle-btn:hover {
+  color: var(--gold-primary) !important;
 }
 
 .header-title {
   font-size: 17px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 15px;
+  }
 }
 
 .header-badge {
@@ -406,7 +473,26 @@ onUnmounted(() => {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+@media (max-width: 480px) {
+  .header-right {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-btn :deep(.n-button__content) {
+    display: none;
+  }
+
+  .login-btn {
+    padding: 0 !important;
+    width: 28px;
+  }
 }
 
 .theme-toggle-btn {
@@ -457,12 +543,40 @@ onUnmounted(() => {
   font-size: 13px;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.header-time--compact {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+@media (max-width: 380px) {
+  .header-time {
+    display: none;
+  }
 }
 
 .app-content {
-  height: calc(100vh - 52px);
+  height: calc(100vh - var(--header-height));
+  padding: var(--content-padding);
   background: var(--bg-primary);
   overflow-y: auto;
+  overflow-x: hidden;
   transition: background 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mobile-drawer-inner {
+  background: var(--bg-sidebar);
+  min-height: 100%;
+  padding-bottom: 24px;
+}
+
+:deep(.mobile-sidebar-drawer .n-drawer-body-content-wrapper) {
+  padding: 0 !important;
 }
 </style>

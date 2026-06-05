@@ -6,7 +6,7 @@
           <template #icon><span style="font-size:14px">↻</span></template>
           刷新
         </n-button>
-        <n-switch v-model:value="autoRefresh" size="small">
+        <n-switch v-model:value="autoRefresh" size="small" class="toolbar-switch">
           <template #checked>自动刷新</template>
           <template #unchecked>手动</template>
         </n-switch>
@@ -108,18 +108,8 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 <style scoped>
 .gold-page {
   max-width: 1200px;
-}
-
-.page-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 22px;
-}
-
-.update-time {
-  color: var(--text-muted);
-  font-size: 13px;
+  width: 100%;
+  min-width: 0;
 }
 
 .card-grid {
@@ -128,7 +118,13 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
   gap: 18px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1024px) {
+  .card-grid {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
   }
@@ -166,7 +162,13 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
   gap: 14px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1024px) {
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
   .info-grid {
     grid-template-columns: 1fr;
   }

@@ -6,7 +6,7 @@
           <template #icon><span style="font-size:14px">↻</span></template>
           刷新
         </n-button>
-        <n-switch v-model:value="autoRefresh" size="small">
+        <n-switch v-model:value="autoRefresh" size="small" class="toolbar-switch">
           <template #checked>自动刷新</template>
           <template #unchecked>手动</template>
         </n-switch>
@@ -39,7 +39,7 @@
     </div>
 
     <div class="stock-detail">
-      <n-grid :cols="2" :x-gap="14" :y-gap="14">
+      <n-grid :cols="detailCols" :x-gap="14" :y-gap="14">
         <n-gi>
           <div class="detail-panel">
             <div class="panel-header">
@@ -76,12 +76,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch, computed } from "vue";
 import { useStockStore } from "../stores/stock";
+import { useBreakpoint } from "../composables/useBreakpoint";
 import PriceCard from "../components/PriceCard.vue";
 import type { StockKey, SymbolConfig, QuoteData } from "../types";
 
 const store = useStockStore();
+const { isMobile } = useBreakpoint();
+const detailCols = computed(() => (isMobile.value ? 1 : 2));
 const stockConfig = store.getConfig() as Record<StockKey, SymbolConfig>;
 const autoRefresh = ref(true);
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -124,18 +127,8 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 <style scoped>
 .stock-page {
   max-width: 1200px;
-}
-
-.page-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 22px;
-}
-
-.update-time {
-  color: var(--text-muted);
-  font-size: 13px;
+  width: 100%;
+  min-width: 0;
 }
 
 .card-grid {
@@ -144,7 +137,13 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
   gap: 18px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 1024px) {
+  .card-grid {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
   }
@@ -248,4 +247,16 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 .index-change.up { color: var(--color-up); }
 .index-change.down { color: var(--color-down); }
 .index-change.flat { color: var(--color-flat); }
+
+@media (max-width: 480px) {
+  .index-row {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .index-change {
+    width: 100%;
+    font-size: 12px;
+  }
+}
 </style>
