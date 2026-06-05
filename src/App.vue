@@ -37,6 +37,7 @@
               <span class="header-badge" v-if="store.loading">更新中...</span>
             </div>
             <div class="header-right">
+              <span class="header-time">{{ currentTime }}</span>
               <!-- 主题切换 -->
               <n-button quaternary circle size="small" @click="themeStore.toggle" class="theme-toggle-btn">
                 <template #icon>
@@ -73,7 +74,6 @@
                   </div>
                 </n-dropdown>
               </template>
-              <span class="header-time">{{ currentTime }}</span>
             </div>
           </n-layout-header>
           <n-layout-content
