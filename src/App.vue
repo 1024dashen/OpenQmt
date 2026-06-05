@@ -173,61 +173,74 @@ const naiveTheme = computed(() => themeStore.isDark ? darkTheme : null);
 const darkThemeOverrides: GlobalThemeOverrides = {
   common: {
     primaryColor: "#d4a843",
-    primaryColorHover: "#e8c46a",
+    primaryColorHover: "#e0b85a",
     primaryColorPressed: "#b8922e",
-    borderRadius: "10px",
+    borderRadius: "12px",
     fontSize: "14px",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    cardColor: "#16181d",
+    modalColor: "#16181d",
+    popoverColor: "#1a1d24",
+    borderColor: "rgba(255,255,255,0.06)",
   },
   Card: {
-    color: "#1a2332",
+    color: "#16181d",
     borderColor: "rgba(255,255,255,0.06)",
-    borderRadius: "12px",
+    borderRadius: "16px",
   },
   Menu: {
-    itemTextColor: "#a0aec0",
-    itemTextColorHover: "#d4a843",
-    itemTextColorActive: "#e8c46a",
-    itemIconColor: "#636e80",
-    itemIconColorHover: "#d4a843",
-    itemIconColorActive: "#e8c46a",
-    itemColorActive: "rgba(212, 168, 67, 0.08)",
-    itemColorActiveHover: "rgba(212, 168, 67, 0.12)",
-    itemHeight: "44px",
+    itemTextColor: "#9ca3af",
+    itemTextColorHover: "#eceef2",
+    itemTextColorActive: "#d4a843",
+    itemIconColor: "#6b7280",
+    itemIconColorHover: "#eceef2",
+    itemIconColorActive: "#d4a843",
+    itemColorActive: "rgba(212, 168, 67, 0.1)",
+    itemColorActiveHover: "rgba(212, 168, 67, 0.14)",
+    itemColorHover: "rgba(255,255,255,0.04)",
+    borderRadius: "10px",
+    itemHeight: "42px",
   },
-  Button: { borderRadiusMedium: "8px" },
+  Button: { borderRadiusMedium: "10px", borderRadiusSmall: "8px" },
   Tag: { borderRadius: "6px" },
-  DataTable: { borderRadius: "12px" },
+  DataTable: { borderRadius: "16px" },
+  Switch: { railColorActive: "#d4a843" },
 };
 
 const lightThemeOverrides: GlobalThemeOverrides = {
   common: {
     primaryColor: "#b8922e",
-    primaryColorHover: "#d4a843",
+    primaryColorHover: "#c9a23a",
     primaryColorPressed: "#9a7a20",
-    borderRadius: "10px",
+    borderRadius: "12px",
     fontSize: "14px",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    cardColor: "#ffffff",
+    modalColor: "#ffffff",
+    borderColor: "rgba(0,0,0,0.06)",
   },
   Card: {
     color: "#ffffff",
-    borderColor: "rgba(0,0,0,0.08)",
-    borderRadius: "12px",
+    borderColor: "rgba(0,0,0,0.06)",
+    borderRadius: "16px",
   },
   Menu: {
-    itemTextColor: "#4a5568",
-    itemTextColorHover: "#b8922e",
-    itemTextColorActive: "#9a7a20",
-    itemIconColor: "#a0aec0",
-    itemIconColorHover: "#b8922e",
-    itemIconColorActive: "#9a7a20",
+    itemTextColor: "#4b5563",
+    itemTextColorHover: "#111827",
+    itemTextColorActive: "#b8922e",
+    itemIconColor: "#9ca3af",
+    itemIconColorHover: "#111827",
+    itemIconColorActive: "#b8922e",
     itemColorActive: "rgba(184, 146, 46, 0.08)",
     itemColorActiveHover: "rgba(184, 146, 46, 0.12)",
-    itemHeight: "44px",
+    itemColorHover: "rgba(0,0,0,0.03)",
+    borderRadius: "10px",
+    itemHeight: "42px",
   },
-  Button: { borderRadiusMedium: "8px" },
+  Button: { borderRadiusMedium: "10px", borderRadiusSmall: "8px" },
   Tag: { borderRadius: "6px" },
-  DataTable: { borderRadius: "12px" },
+  DataTable: { borderRadius: "16px" },
+  Switch: { railColorActive: "#b8922e" },
 };
 
 const currentThemeOverrides = computed(() =>
@@ -367,12 +380,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, #d4a843 0%, #e8c46a 50%, #b8922e 100%);
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  background: var(--gold-primary);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(212, 168, 67, 0.35);
 }
 
 .logo-letter {
@@ -390,23 +402,22 @@ onUnmounted(() => {
 }
 
 .logo-text {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--gold-primary);
-  letter-spacing: 0.5px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .logo-sub {
   font-size: 11px;
   color: var(--text-muted);
-  letter-spacing: 1px;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-divider {
   height: 1px;
-  margin: 0 16px 8px;
-  background: linear-gradient(90deg, var(--gold-primary) 0%, var(--border-subtle) 100%);
-  opacity: 0.4;
+  margin: 0 16px 10px;
+  background: var(--border-subtle);
 }
 
 .app-main {
@@ -425,8 +436,9 @@ onUnmounted(() => {
   gap: 8px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-subtle);
-  backdrop-filter: blur(10px);
-  transition: background 0.3s ease;
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  transition: background var(--transition-normal);
   min-width: 0;
 }
 
@@ -448,9 +460,10 @@ onUnmounted(() => {
 }
 
 .header-title {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -464,10 +477,11 @@ onUnmounted(() => {
 
 .header-badge {
   font-size: 11px;
+  font-weight: 500;
   color: var(--gold-primary);
-  background: rgba(212, 168, 67, 0.12);
-  padding: 2px 8px;
-  border-radius: 6px;
+  background: rgba(212, 168, 67, 0.1);
+  padding: 3px 8px;
+  border-radius: 100px;
 }
 
 .header-right {
@@ -513,9 +527,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
+  padding: 4px 10px 4px 4px;
+  border-radius: 100px;
+  border: 1px solid var(--border-subtle);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .user-area:hover {
@@ -540,10 +555,13 @@ onUnmounted(() => {
 
 .header-time {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.02em;
   white-space: nowrap;
+  padding: 4px 10px;
+  background: var(--surface-muted);
+  border-radius: 100px;
 }
 
 .header-time--compact {

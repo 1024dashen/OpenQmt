@@ -1,12 +1,12 @@
 <template>
   <div class="learn-page">
     <div class="page-intro">
-      <h2 class="intro-title">技术指标学习</h2>
-      <p class="intro-desc">掌握核心技术分析工具，提升投资决策能力</p>
+      <h2 class="page-intro-title">技术指标学习</h2>
+      <p class="page-intro-desc">掌握核心技术分析工具，提升投资决策能力</p>
     </div>
     <n-grid :cols="gridCols" :x-gap="14" :y-gap="14">
       <n-gi v-for="topic in topics" :key="topic.id">
-        <div class="learn-card" :class="`level-${topic.level}`" @click="selectTopic(topic)">
+        <div class="learn-card surface-card" :class="`level-${topic.level}`" @click="selectTopic(topic)">
           <div class="learn-card-inner">
             <div class="learn-card-header">
               <span class="topic-icon">{{ topic.icon }}</span>
@@ -93,48 +93,15 @@ const topics: LearnTopic[] = [
 }
 
 .page-intro {
-  margin-bottom: 22px;
-}
-
-.intro-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.intro-desc {
-  color: var(--text-muted);
-  font-size: 14px;
+  margin-bottom: 24px;
 }
 
 .learn-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .learn-card:hover {
-  transform: translateY(-2px);
-  background: var(--bg-card-hover);
-}
-
-.learn-card.level-初级:hover {
-  border-color: rgba(34, 197, 94, 0.25);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.08);
-}
-
-.learn-card.level-中级:hover {
-  border-color: rgba(212, 168, 67, 0.25);
-  box-shadow: 0 8px 20px rgba(212, 168, 67, 0.08);
-}
-
-.learn-card.level-高级:hover {
-  border-color: rgba(239, 68, 68, 0.25);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.08);
+  transform: none;
 }
 
 .learn-card-inner {
@@ -161,9 +128,9 @@ const topics: LearnTopic[] = [
 
 .topic-level {
   font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 5px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 100px;
 }
 
 .badge-初级 {

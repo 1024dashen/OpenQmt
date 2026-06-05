@@ -257,13 +257,13 @@ function resetForms() {
 
 <style scoped>
 .auth-dialog {
-  width: 420px;
+  width: 400px;
   max-width: calc(100vw - 32px);
   background: var(--bg-card);
-  border-radius: 16px;
-  padding: 32px 36px 24px;
-  box-shadow: var(--shadow-card), var(--shadow-glow-gold);
-  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  padding: 32px 32px 24px;
+  box-shadow: var(--shadow-card-hover);
+  border: 1px solid var(--border-subtle);
 }
 
 @media (max-width: 480px) {
@@ -279,15 +279,14 @@ function resetForms() {
 }
 
 .auth-logo {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--gold-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  box-shadow: 0 4px 16px rgba(212, 168, 67, 0.3);
 }
 
 .auth-logo-letter {
@@ -322,9 +321,7 @@ function resetForms() {
   height: 44px;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)) !important;
-  border: none !important;
+  border-radius: var(--radius-md) !important;
 }
 
 .auth-submit-btn:hover {

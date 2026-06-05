@@ -34,14 +34,12 @@
       </div>
     </n-spin>
 
-    <div class="section-divider">
-      <span class="section-label">详细数据</span>
-    </div>
+    <h3 class="section-title">详细数据</h3>
 
     <div class="stock-detail">
       <n-grid :cols="detailCols" :x-gap="14" :y-gap="14">
         <n-gi>
-          <div class="detail-panel">
+          <div class="detail-panel surface-card">
             <div class="panel-header">
               <span class="panel-icon">🇨🇳</span>
               <span class="panel-title">A股市场</span>
@@ -56,7 +54,7 @@
           </div>
         </n-gi>
         <n-gi>
-          <div class="detail-panel">
+          <div class="detail-panel surface-card">
             <div class="panel-header">
               <span class="panel-icon">🌏</span>
               <span class="panel-title">海外市场</span>
@@ -134,58 +132,22 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 .card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-}
-
-@media (max-width: 1024px) {
-  .card-grid {
-    gap: 14px;
-  }
+  gap: 16px;
 }
 
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
-.section-divider {
-  display: flex;
-  align-items: center;
-  margin: 28px 0 18px;
-  gap: 12px;
-}
-
-.section-divider::before,
-.section-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,168,67,0.15), transparent);
-}
-
-.section-label {
-  color: var(--gold-primary);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 2px;
-}
-
-.stock-detail {
-  margin-top: 2px;
-}
-
 .detail-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
   padding: 18px 20px;
-  transition: all 0.3s;
 }
 
 .detail-panel:hover {
-  border-color: rgba(212,168,67,0.12);
-  background: var(--bg-card-hover);
+  transform: none;
 }
 
 .panel-header {
@@ -200,9 +162,10 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 }
 
 .panel-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .panel-body {
@@ -215,8 +178,8 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .index-row:last-child {

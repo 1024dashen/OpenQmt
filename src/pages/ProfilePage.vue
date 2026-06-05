@@ -1,6 +1,6 @@
 <template>
   <div class="profile-page">
-    <div class="profile-header">
+    <div class="profile-header surface-card">
       <div class="profile-avatar-area">
         <n-avatar
           v-if="authStore.user?.avatar_url"
@@ -24,7 +24,7 @@
 
     <div class="profile-grid">
       <!-- 积分卡片 -->
-      <div class="profile-card credits-card">
+      <div class="profile-card credits-card surface-card">
         <div class="card-header">
           <n-icon size="20" color="var(--gold-primary)"><DiamondOutline /></n-icon>
           <span class="card-title">我的积分</span>
@@ -61,7 +61,7 @@
       </div>
 
       <!-- 修改昵称 -->
-      <div class="profile-card">
+      <div class="profile-card surface-card">
         <div class="card-header">
           <n-icon size="20" color="var(--gold-primary)"><CreateOutline /></n-icon>
           <span class="card-title">修改昵称</span>
@@ -87,7 +87,7 @@
       </div>
 
       <!-- 修改密码 -->
-      <div class="profile-card">
+      <div class="profile-card surface-card">
         <div class="card-header">
           <n-icon size="20" color="var(--gold-primary)"><LockClosedOutline /></n-icon>
           <span class="card-title">修改密码</span>
@@ -128,7 +128,7 @@
       </div>
 
       <!-- 账户信息 -->
-      <div class="profile-card">
+      <div class="profile-card surface-card">
         <div class="card-header">
           <n-icon size="20" color="var(--gold-primary)"><InformationCircleOutline /></n-icon>
           <span class="card-title">账户信息</span>
@@ -258,11 +258,11 @@ async function handleUpdatePassword() {
   align-items: center;
   gap: 24px;
   padding: 28px 32px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border-subtle);
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-card);
+  margin-bottom: 20px;
+}
+
+.profile-header:hover {
+  transform: none;
 }
 
 .profile-avatar-default {
@@ -279,9 +279,10 @@ async function handleUpdatePassword() {
 }
 
 .profile-name {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
@@ -306,11 +307,11 @@ async function handleUpdatePassword() {
 }
 
 .profile-card {
-  background: var(--bg-card);
-  border-radius: 14px;
-  border: 1px solid var(--border-subtle);
   padding: 24px;
-  box-shadow: var(--shadow-card);
+}
+
+.profile-card:hover {
+  transform: none;
 }
 
 .card-header {
@@ -347,11 +348,12 @@ async function handleUpdatePassword() {
 }
 
 .credits-value {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 44px;
+  font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
   color: var(--gold-primary);
   line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .credits-unit {
@@ -378,25 +380,24 @@ async function handleUpdatePassword() {
 }
 
 .recharge-option {
-  background: var(--bg-primary);
+  background: var(--surface-muted);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 14px 12px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
   position: relative;
 }
 
 .recharge-option:hover {
-  border-color: var(--gold-primary);
-  background: rgba(212, 168, 67, 0.06);
+  border-color: var(--border-accent);
+  background: var(--bg-card-hover);
 }
 
 .recharge-option.active {
   border-color: var(--gold-primary);
-  background: rgba(212, 168, 67, 0.12);
-  box-shadow: 0 0 0 1px var(--gold-primary);
+  background: rgba(212, 168, 67, 0.08);
 }
 
 .recharge-amount {
@@ -421,9 +422,7 @@ async function handleUpdatePassword() {
 .recharge-btn {
   height: 42px;
   font-weight: 600;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)) !important;
-  border: none !important;
+  border-radius: var(--radius-md) !important;
 }
 
 /* 信息列表 */

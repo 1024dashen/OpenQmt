@@ -36,13 +36,11 @@
       </div>
     </n-spin>
 
-    <div class="section-divider">
-      <span class="section-label">市场资讯</span>
-    </div>
+    <h3 class="section-title">市场资讯</h3>
 
     <div class="gold-info">
       <div class="info-grid">
-        <div class="info-card">
+        <div class="info-card surface-card">
           <div class="info-icon-wrap warning">
             <span class="info-icon-text">🪙</span>
           </div>
@@ -51,7 +49,7 @@
             <p>经国务院批准，由中国人民银行组建的国家级黄金交易平台，Au99.99为标准黄金合约。</p>
           </div>
         </div>
-        <div class="info-card">
+        <div class="info-card surface-card">
           <div class="info-icon-wrap info">
             <span class="info-icon-text">🏦</span>
           </div>
@@ -60,7 +58,7 @@
             <p>银行推出的黄金积存产品，价格参考上海黄金交易所金价，门槛低、适合长期定投。</p>
           </div>
         </div>
-        <div class="info-card">
+        <div class="info-card surface-card">
           <div class="info-icon-wrap success">
             <span class="info-icon-text">🌍</span>
           </div>
@@ -115,45 +113,14 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 .card-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-}
-
-@media (max-width: 1024px) {
-  .card-grid {
-    gap: 14px;
-  }
+  gap: 16px;
 }
 
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-}
-
-.section-divider {
-  display: flex;
-  align-items: center;
-  margin: 28px 0 18px;
-  gap: 12px;
-}
-
-.section-divider::before,
-.section-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,168,67,0.15), transparent);
-}
-
-.section-label {
-  color: var(--gold-primary);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 2px;
-}
-
-.gold-info {
-  margin-top: 2px;
 }
 
 .info-grid {
@@ -175,42 +142,28 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
 }
 
 .info-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
   padding: 16px;
   display: flex;
   gap: 14px;
-  transition: all 0.3s;
 }
 
 .info-card:hover {
-  border-color: rgba(212,168,67,0.15);
-  background: var(--bg-card-hover);
+  transform: none;
 }
 
 .info-icon-wrap {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.info-icon-wrap.warning {
-  background: rgba(212,168,67,0.12);
-}
-.info-icon-wrap.info {
-  background: rgba(99,179,237,0.12);
-}
-.info-icon-wrap.success {
-  background: rgba(34,197,94,0.12);
+  background: var(--surface-muted);
 }
 
 .info-icon-text {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .info-body h4 {
@@ -218,11 +171,12 @@ onUnmounted(() => { if (timer) clearInterval(timer); });
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 4px;
+  letter-spacing: -0.01em;
 }
 
 .info-body p {
   color: var(--text-muted);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 </style>

@@ -1,19 +1,16 @@
 <template>
-  <div class="price-card-wrap" :class="{ 'card-up': isUp, 'card-down': isDown }">
-    <div class="card-top-bar" :class="priceClass"></div>
+  <div class="price-card-wrap surface-card">
     <div class="card-body">
       <div class="card-header">
+        <span class="status-dot" :class="priceClass"></span>
         <span class="card-icon">{{ icon }}</span>
         <span class="card-name">{{ name }}</span>
         <span class="card-unit" v-if="unit">{{ unit }}</span>
       </div>
       <div class="card-price-row">
         <span class="card-price num-mono" :class="priceClass">{{ formatPrice(current) }}</span>
+        <span class="card-change-pill num-mono" :class="priceClass">{{ changeStr }}</span>
       </div>
-      <div class="card-change-row" :class="priceClass">
-        <span class="card-change-val num-mono">{{ changeStr }}</span>
-      </div>
-      <div class="card-divider"></div>
       <div class="card-detail">
         <div class="detail-item">
           <span class="detail-label">开盘</span>
@@ -27,10 +24,10 @@
           <span class="detail-label">最低</span>
           <span class="detail-value num-mono price-down">{{ formatPrice(low) }}</span>
         </div>
-      </div>
-      <div class="card-volume" v-if="volume > 0">
-        <span class="detail-label">成交量</span>
-        <span class="detail-value num-mono">{{ formatVolume(volume) }}</span>
+        <div class="detail-item" v-if="volume > 0">
+          <span class="detail-label">成交量</span>
+          <span class="detail-value num-mono">{{ formatVolume(volume) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -76,7 +73,7 @@ const priceClass = computed(() => {
 
 const changeStr = computed(() => {
   const sign = props.change > 0 ? "+" : "";
-  return `${sign}${props.change.toFixed(props.decimals)}  ${sign}${props.changePercent.toFixed(2)}%`;
+  return `${sign}${props.change.toFixed(props.decimals)} · ${sign}${props.changePercent.toFixed(2)}%`;
 });
 
 function formatPrice(val: number): string {
@@ -94,166 +91,135 @@ function formatVolume(val: number): string {
 
 <style scoped>
 .price-card-wrap {
-  position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  overflow: hidden;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
 }
 
 .price-card-wrap:hover {
-  transform: translateY(-3px);
-  background: var(--bg-card-hover);
-  border-color: rgba(212, 168, 67, 0.18);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(212, 168, 67, 0.08);
-}
-
-.card-top-bar {
-  height: 3px;
-  width: 100%;
-  transition: background 0.3s;
-}
-
-.card-top-bar.up {
-  background: linear-gradient(90deg, var(--color-up), rgba(239, 68, 68, 0.4));
-}
-
-.card-top-bar.down {
-  background: linear-gradient(90deg, var(--color-down), rgba(34, 197, 94, 0.4));
-}
-
-.card-top-bar.flat {
-  background: linear-gradient(90deg, var(--color-flat), rgba(156, 163, 175, 0.3));
+  transform: none;
 }
 
 .card-body {
-  padding: 18px 20px 16px;
+  padding: 18px 20px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.up { background: var(--color-up); }
+.status-dot.down { background: var(--color-down); }
+.status-dot.flat { background: var(--color-flat); }
+
 .card-icon {
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
 }
 
 .card-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
   flex: 1;
 }
 
 .card-unit {
   font-size: 11px;
   color: var(--text-muted);
-  background: rgba(212, 168, 67, 0.1);
+  background: var(--surface-muted);
   padding: 2px 8px;
-  border-radius: 5px;
-  letter-spacing: 0.3px;
+  border-radius: 100px;
 }
 
 .card-price-row {
-  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .card-price {
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.5px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .card-price.up { color: var(--color-up); }
 .card-price.down { color: var(--color-down); }
-.card-price.flat { color: var(--color-flat); }
+.card-price.flat { color: var(--text-primary); }
 
-.card-change-row {
-  margin-bottom: 4px;
+.card-change-pill {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
 }
 
-.card-change-row.up {
+.card-change-pill.up {
   color: var(--color-up);
   background: var(--color-up-bg);
-  padding: 3px 10px;
-  border-radius: 6px;
-  display: inline-block;
 }
 
-.card-change-row.down {
+.card-change-pill.down {
   color: var(--color-down);
   background: var(--color-down-bg);
-  padding: 3px 10px;
-  border-radius: 6px;
-  display: inline-block;
 }
 
-.card-change-row.flat {
+.card-change-pill.flat {
   color: var(--color-flat);
-}
-
-.card-change-val {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.card-divider {
-  height: 1px;
-  margin: 12px 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  background: var(--surface-muted);
 }
 
 .card-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .detail-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .detail-label {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
 }
 
 .detail-value {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 13px;
-  font-weight: 600;
-}
-
-.card-volume {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .card-body {
-    padding: 14px 16px 12px;
+    padding: 16px;
   }
 
   .card-price {
-    font-size: 26px;
+    font-size: 24px;
   }
 
-  .card-header {
-    margin-bottom: 10px;
+  .card-change-pill {
+    font-size: 11px;
+    padding: 3px 8px;
   }
 }
 </style>

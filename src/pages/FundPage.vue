@@ -184,8 +184,9 @@ onMounted(() => { refreshData(); });
 
 .fund-table {
   background: var(--bg-card);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -194,21 +195,22 @@ onMounted(() => { refreshData(); });
 }
 
 :deep(.n-data-table .n-data-table-th) {
-  background: rgba(212, 168, 67, 0.06) !important;
-  color: var(--text-secondary) !important;
+  background: var(--surface-muted) !important;
+  color: var(--text-muted) !important;
   font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-subtle) !important;
 }
 
 :deep(.n-data-table .n-data-table-td) {
-  border-bottom: 1px solid rgba(255,255,255,0.03) !important;
-  padding: 10px 12px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  padding: 12px 14px !important;
 }
 
 :deep(.n-data-table .n-data-table-tr:hover td) {
-  background: rgba(212, 168, 67, 0.04) !important;
+  background: var(--surface-muted) !important;
 }
 
 :deep(.n-pagination) {
