@@ -172,6 +172,8 @@
 
             <!-- 登录/注册对话框 -->
             <AuthDialog v-model:show="showAuthDialog" />
+            <SettingsDialog v-model:show="showSettingsDialog" />
+            <AboutDialog v-model:show="showAboutDialog" />
         </n-message-provider>
     </n-config-provider>
 </template>
@@ -195,6 +197,8 @@ import {
     SunnyOutline,
     MoonOutline,
     MenuOutline,
+    SettingsOutline,
+    InformationCircleOutline,
 } from '@vicons/ionicons5'
 import router from './router'
 import { useBreakpoint } from './composables/useBreakpoint'
@@ -202,6 +206,8 @@ import { useGoldStore } from './stores/gold'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import AuthDialog from './components/AuthDialog.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
+import AboutDialog from './components/AboutDialog.vue'
 
 const route = useRoute()
 const goldStore = useGoldStore()
@@ -214,6 +220,8 @@ const collapsed = ref(false)
 const mobileSidebarOpen = ref(false)
 const currentTime = ref('')
 const showAuthDialog = ref(false)
+const showSettingsDialog = ref(false)
+const showAboutDialog = ref(false)
 let timer: ReturnType<typeof setInterval> | null = null
 
 // ── Naive UI 主题 ──
@@ -333,6 +341,8 @@ const menuOptions = computed<MenuOption[]>(() => [
 
 const userDropdownOptions: DropdownOption[] = [
     { label: '个人中心', key: 'profile', icon: renderIcon(PersonOutline) },
+    { label: '系统设置', key: 'settings', icon: renderIcon(SettingsOutline) },
+    { label: '关于我们', key: 'about', icon: renderIcon(InformationCircleOutline) },
     { type: 'divider' },
     { label: '退出登录', key: 'logout', icon: renderIcon(LogOutOutline) },
 ]
@@ -342,6 +352,10 @@ async function handleUserDropdown(key: string) {
         await authStore.logout()
     } else if (key === 'profile') {
         router.push('/profile')
+    } else if (key === 'settings') {
+        showSettingsDialog.value = true
+    } else if (key === 'about') {
+        showAboutDialog.value = true
     }
 }
 

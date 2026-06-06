@@ -33,8 +33,11 @@
         </div>
 
         <div class="profile-grid">
-            <!-- 积分卡片 -->
-            <div class="profile-card credits-card surface-card surface-card--flat">
+            <!-- 积分卡片（暂时隐藏） -->
+            <div
+                v-if="showCreditsSection"
+                class="profile-card credits-card surface-card surface-card--flat"
+            >
                 <div class="card-header">
                     <n-icon size="20" color="var(--gold-primary)"
                         ><DiamondOutline
@@ -200,6 +203,8 @@ import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
 const message = useMessage()
+
+const showCreditsSection = false
 
 // ── 积分充值 ──
 const rechargeOptions = [

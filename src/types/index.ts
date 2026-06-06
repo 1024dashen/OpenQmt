@@ -57,6 +57,23 @@ export interface LearnTopic {
   detail: string;
 }
 
+/** 模型提供商 */
+export type ModelProvider =
+  | "openai"
+  | "anthropic"
+  | "google"
+  | "deepseek"
+  | "ollama"
+  | "custom";
+
+/** 模型配置 */
+export interface ModelSettings {
+  provider: ModelProvider;
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+}
+
 /** AI 聊天消息 */
 export interface AiMessage {
   id: string;

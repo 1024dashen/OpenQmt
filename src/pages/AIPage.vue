@@ -8,6 +8,9 @@
                     <p class="welcome-desc">
                         输入您感兴趣的领域，AI 将为您推荐相关的投资标的
                     </p>
+                    <p class="welcome-provider">
+                        当前模型：{{ settingsStore.providerLabel }} · {{ settingsStore.model.model }}
+                    </p>
                     <div class="quick-questions">
                         <div
                             v-for="q in quickQuestions"
@@ -78,6 +81,9 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import type { AiMessage } from '../types'
+import { useSettingsStore } from '../stores/settings'
+
+const settingsStore = useSettingsStore()
 
 const messages = ref<AiMessage[]>([])
 const inputText = ref('')
@@ -228,8 +234,14 @@ function generateAIResponse(question: string): string {
 .welcome-desc {
     color: var(--text-muted);
     font-size: 14px;
-    margin-bottom: 24px;
+    margin-bottom: 8px;
     line-height: 1.5;
+}
+
+.welcome-provider {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 24px;
 }
 
 .quick-questions {
