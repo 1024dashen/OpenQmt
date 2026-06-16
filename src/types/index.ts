@@ -67,8 +67,25 @@ export type ModelProvider =
     | 'anthropic'
     | 'google'
     | 'deepseek'
+    | 'qwen'
     | 'ollama'
     | 'custom'
+
+/** 单个模型配置 */
+export interface ModelOption {
+    id: string
+    name: string
+    enabled: boolean
+}
+
+/** 模型提供商配置 */
+export interface ProviderConfig {
+    provider: ModelProvider
+    apiKey: string
+    baseUrl: string
+    models: ModelOption[]
+    activeModel: string
+}
 
 /** 模型配置 */
 export interface ModelSettings {
@@ -76,6 +93,16 @@ export interface ModelSettings {
     apiKey: string
     baseUrl: string
     model: string
+    systemPrompt: string
+    providers: Record<ModelProvider, ProviderConfig>
+    customProviders: Array<{
+        id: string
+        name: string
+        baseUrl: string
+        apiKey: string
+        models: ModelOption[]
+        activeModel: string
+    }>
 }
 
 /** AI 聊天消息 */
