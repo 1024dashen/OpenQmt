@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export type ThemeMode = "dark" | "light";
 
@@ -10,10 +11,11 @@ export const useThemeStore = defineStore("theme", () => {
 
   const isDark = computed(() => mode.value === "dark");
 
-  function toggle() {
+  async function toggle() {
     mode.value = mode.value === "dark" ? "light" : "dark";
     localStorage.setItem(THEME_KEY, mode.value);
     applyTheme();
+    await setTauriTheme();
   }
 
   function applyTheme() {
@@ -21,8 +23,20 @@ export const useThemeStore = defineStore("theme", () => {
     root.setAttribute("data-theme", mode.value);
   }
 
+  async function setTauriTheme() {
+    try {
+      const window = getCurrentWindow();
+      // Tauri 的主题值: "Light", "Dark", 或 "Auto"
+      const tauriTheme = mode.value === "dark" ? "Dark" : "Light";
+      await window.setTheme(tauriTheme as any);
+    } catch (error) {
+      console.warn("Failed to set Tauri theme:", error);
+    }
+  }
+
   function init() {
     applyTheme();
+    setTauriTheme();
   }
 
   return { mode, isDark, toggle, init };
