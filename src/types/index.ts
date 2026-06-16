@@ -51,16 +51,45 @@ export interface FundRankItem {
     yearChange: number
 }
 
-/** 学习主题 */
-export interface LearnTopic {
+/** 学习难度 */
+export type LearnLevel = '初级' | '中级' | '高级'
+
+/** 学习分类 */
+export type LearnCategory = 'basic' | 'strategy'
+
+/** 学习内容类型 */
+export type LearnContentType = 'article' | 'video'
+
+/** 学习帖子公共字段 */
+export interface LearnPostBase {
     id: number
-    icon: string
+    type: LearnContentType
     title: string
-    level: '初级' | '中级' | '高级'
-    category: 'basic' | 'strategy'
-    desc: string
-    detail: string
+    cover: string
+    coverHeight: number
+    author: string
+    likes: number
+    level: LearnLevel
+    category: LearnCategory
 }
+
+/** 图文帖子 */
+export interface LearnArticle extends LearnPostBase {
+    type: 'article'
+    /** 富文本正文，可包含文字、图片、视频、音频等 HTML 元素 */
+    content: string
+}
+
+/** 视频帖子 */
+export interface LearnVideo extends LearnPostBase {
+    type: 'video'
+    videoUrl: string
+    duration: string
+    description?: string
+}
+
+/** 学习帖子 */
+export type LearnPost = LearnArticle | LearnVideo
 
 /** 模型提供商 */
 export type ModelProvider =

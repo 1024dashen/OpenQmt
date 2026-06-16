@@ -1,171 +1,210 @@
 <template>
     <div class="learn-page">
-        <div class="page-intro">
-            <h2 class="page-intro-title">技术指标学习</h2>
-            <p class="page-intro-desc">
-                掌握核心技术分析工具，提升投资决策能力
-            </p>
-        </div>
-        <n-grid :cols="gridCols" :x-gap="14" :y-gap="14">
-            <n-gi v-for="topic in filteredTopics" :key="topic.id">
+        <div
+            class="feed-masonry"
+            :style="{ columnCount: columnCount }"
+        >
+            <div
+                v-for="post in filteredPosts"
+                :key="post.id"
+                class="feed-card surface-card surface-card--interactive"
+                @click="openPost(post)"
+            >
                 <div
-                    class="learn-card surface-card surface-card--interactive"
-                    :class="`level-${topic.level}`"
-                    @click="selectTopic(topic)"
+                    class="feed-cover"
+                    :style="{ height: post.coverHeight + 'px' }"
                 >
-                    <div class="learn-card-inner">
-                        <div class="learn-card-header">
-                            <span class="topic-icon">{{ topic.icon }}</span>
-                            <span class="topic-title">{{ topic.title }}</span>
-                            <span
-                                class="topic-level"
-                                :class="`badge-${topic.level}`"
-                                >{{ topic.level }}</span
-                            >
-                        </div>
-                        <p class="topic-desc">{{ topic.desc }}</p>
+                    <img
+                        :src="post.cover"
+                        :alt="post.title"
+                        class="feed-cover-img"
+                        loading="lazy"
+                    />
+                    <span
+                        class="feed-level"
+                        :class="`badge-${post.level}`"
+                    >{{ post.level }}</span>
+                    <div v-if="post.type === 'video'" class="feed-video-badge">
+                        <n-icon :size="14" color="#fff">
+                            <Play />
+                        </n-icon>
+                        <span>{{ post.duration }}</span>
                     </div>
                 </div>
-            </n-gi>
-        </n-grid>
+                <div class="feed-body">
+                    <p class="feed-title">{{ post.title }}</p>
+                    <div class="feed-meta">
+                        <span class="feed-author">{{ post.author }}</span>
+                        <span class="feed-likes">
+                            <n-icon :size="13">
+                                <HeartOutline />
+                            </n-icon>
+                            {{ formatLikes(post.likes) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <n-modal
-            v-model:show="showModal"
-            preset="card"
-            :title="currentTopic?.title"
-            class="learn-modal"
-            :style="{ width: modalWidth, maxHeight: '80vh' }"
-            :bordered="false"
-        >
-            <div class="modal-content" v-if="currentTopic">
-                <span
-                    class="modal-level"
-                    :class="`badge-${currentTopic.level}`"
-                    >{{ currentTopic.level }}</span
+        <!-- 图文详情 -->
+        <Teleport to="body">
+            <Transition name="detail-fade">
+                <div
+                    v-if="showArticle && currentArticle"
+                    class="article-overlay"
                 >
-                <div class="topic-detail" v-html="currentTopic.detail"></div>
+                    <header class="article-header">
+                        <button
+                            class="article-back"
+                            @click="closeArticle"
+                        >
+                            <n-icon :size="22">
+                                <ChevronBack />
+                            </n-icon>
+                        </button>
+                        <span class="article-header-title">图文详情</span>
+                    </header>
+
+                    <div class="article-scroll">
+                        <div class="article-content-wrap">
+                            <h2 class="article-title">
+                                {{ currentArticle.title }}
+                            </h2>
+                            <div class="article-author-row">
+                                <span class="article-author">{{
+                                    currentArticle.author
+                                }}</span>
+                                <span
+                                    class="article-level"
+                                    :class="`badge-${currentArticle.level}`"
+                                >{{ currentArticle.level }}</span>
+                            </div>
+                            <div
+                                ref="articleContentRef"
+                                class="article-content"
+                                v-html="currentArticle.content"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
+
+        <!-- 视频播放 -->
+        <n-modal
+            v-model:show="showVideo"
+            preset="card"
+            :title="currentVideo?.title"
+            class="video-modal"
+            :style="{ width: videoModalWidth }"
+            :bordered="false"
+            @after-leave="onVideoClose"
+        >
+            <div v-if="currentVideo" class="video-player-wrap">
+                <video
+                    ref="videoRef"
+                    class="video-player"
+                    :src="currentVideo.videoUrl"
+                    controls
+                    playsinline
+                    @click.stop
+                />
+                <p
+                    v-if="currentVideo.description"
+                    class="video-desc"
+                >
+                    {{ currentVideo.description }}
+                </p>
             </div>
         </n-modal>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { LearnTopic } from '../types'
+import { ref, computed, watch, nextTick } from 'vue'
+import { NIcon, NModal } from 'naive-ui'
+import {
+    Play,
+    HeartOutline,
+    ChevronBack,
+} from '@vicons/ionicons5'
+import type { LearnPost, LearnArticle, LearnVideo } from '../types'
+import { learnPosts } from '../data/learnPosts'
 import { useBreakpoint } from '../composables/useBreakpoint'
 import { useLearnStore } from '../stores/learn'
 
-const { isMobile } = useBreakpoint()
+const { isMobile, isTablet } = useBreakpoint()
 const learnStore = useLearnStore()
-const gridCols = computed(() => (isMobile.value ? 1 : 2))
-const modalWidth = computed(() =>
-    isMobile.value ? 'calc(100vw - 32px)' : '700px'
-)
-const showModal = ref(false)
-const currentTopic = ref<LearnTopic | null>(null)
 
-function selectTopic(topic: LearnTopic): void {
-    currentTopic.value = topic
-    showModal.value = true
+const columnCount = computed(() => {
+    if (isMobile.value) return 2
+    if (isTablet.value) return 3
+    return 4
+})
+
+const videoModalWidth = computed(() =>
+    isMobile.value ? 'calc(100vw - 32px)' : '720px'
+)
+
+const showArticle = ref(false)
+const showVideo = ref(false)
+const currentArticle = ref<LearnArticle | null>(null)
+const currentVideo = ref<LearnVideo | null>(null)
+const articleContentRef = ref<HTMLElement | null>(null)
+const videoRef = ref<HTMLVideoElement | null>(null)
+
+const filteredPosts = computed(() => {
+    const category = learnStore.category
+    if (category === 'all') return learnPosts
+    return learnPosts.filter((p) => p.category === category)
+})
+
+function formatLikes(n: number): string {
+    if (n >= 10000) return (n / 10000).toFixed(1) + 'w'
+    if (n >= 1000) return (n / 1000).toFixed(1) + 'k'
+    return String(n)
 }
 
-const topics: LearnTopic[] = [
-    {
-        id: 1,
-        icon: '📈',
-        title: 'K线基础',
-        level: '初级',
-        category: 'basic',
-        desc: '学习K线图的构成，阳线阴线的含义，以及各种K线形态的市场信号。',
-        detail: `<h3>什么是K线？</h3><p>K线（Candlestick Chart）是最基础的技术分析工具。</p><h4>阳线（红色）</h4><p>收盘价 > 开盘价，表示上涨。实体越长，买方力量越强。</p><ul><li><b>大阳线</b>：强烈看涨信号</li><li><b>小阳线</b>：多空力量接近</li><li><b>上影阳线</b>：上方有卖压</li></ul><h4>阴线（绿色）</h4><p>收盘价 < 开盘价，表示下跌。</p><h4>十字星</h4><p>多空势均力敌，可能是反转信号。</p>`,
-    },
-    {
-        id: 2,
-        icon: '📊',
-        title: '均线（MA）',
-        level: '初级',
-        category: 'basic',
-        desc: '移动平均线是最常用的趋势指标，帮助判断方向和支撑阻力。',
-        detail: `<h3>移动平均线</h3><h4>常用周期</h4><ul><li><b>MA5</b>：短期趋势</li><li><b>MA20</b>：中期趋势</li><li><b>MA60</b>：中长期趋势</li><li><b>MA250</b>：牛熊分界线</li></ul><h4>金叉与死叉</h4><p><b>金叉</b>：买入信号。<b>死叉</b>：卖出信号。</p>`,
-    },
-    {
-        id: 3,
-        icon: '🔺',
-        title: 'MACD指标',
-        level: '中级',
-        category: 'strategy',
-        desc: '趋势跟踪指标，通过快慢均线判断买卖时机。',
-        detail: `<h3>MACD</h3><h4>组成要素</h4><ul><li><b>DIF线</b>：12日EMA - 26日EMA</li><li><b>DEA线</b>：DIF的9日EMA</li><li><b>MACD柱</b>：(DIF - DEA) × 2</li></ul><h4>买卖信号</h4><p>金叉买入；死叉卖出。顶背离看跌，底背离看涨。</p>`,
-    },
-    {
-        id: 4,
-        icon: '⚡',
-        title: 'KDJ指标',
-        level: '中级',
-        category: 'strategy',
-        desc: '超买超卖指标，判断市场超买超卖状态。',
-        detail: `<h3>KDJ随机指标</h3><ul><li>K > 80：超买，可能回调</li><li>K < 20：超卖，可能反弹</li><li>J > 100：极度超买</li></ul><p>KDJ在强势趋势中容易钝化。</p>`,
-    },
-    {
-        id: 5,
-        icon: '🌊',
-        title: 'RSI指标',
-        level: '中级',
-        category: 'strategy',
-        desc: '衡量多空力量对比，判断超买超卖。',
-        detail: `<h3>RSI</h3><ul><li>RSI > 80：超买</li><li>RSI < 20：超卖</li></ul><h4>背离</h4><p>顶背离看跌，底背离看涨。</p>`,
-    },
-    {
-        id: 6,
-        icon: '🎯',
-        title: '布林带（BOLL）',
-        level: '中级',
-        category: 'strategy',
-        desc: '通过标准差判断价格波动区间。',
-        detail: `<h3>布林带</h3><ul><li>触及上轨：可能回调</li><li>触及下轨：可能反弹</li><li>缩口：即将变盘</li></ul>`,
-    },
-    {
-        id: 7,
-        icon: '📉',
-        title: '成交量分析',
-        level: '初级',
-        category: 'basic',
-        desc: '量价配合是技术分析的核心原则。',
-        detail: `<h3>成交量分析</h3><ul><li><b>量增价升</b>：健康上涨</li><li><b>量缩价升</b>：动力不足</li><li><b>天量天价</b>：常见顶部</li></ul>`,
-    },
-    {
-        id: 8,
-        icon: '🏗️',
-        title: '支撑与阻力',
-        level: '初级',
-        category: 'basic',
-        desc: '判断买入和卖出时机的基础概念。',
-        detail: `<h3>支撑与阻力</h3><ul><li>前期高低点</li><li>整数关口</li><li>均线位置</li></ul><p>突破后角色互换。</p>`,
-    },
-    {
-        id: 9,
-        icon: '📋',
-        title: '筹码分布',
-        level: '高级',
-        category: 'strategy',
-        desc: '了解持仓成本结构，判断主力行为。',
-        detail: `<h3>筹码分布</h3><ul><li>筹码密集：支撑/阻力</li><li>单峰密集：方向选择</li></ul><h4>主力行为</h4><ul><li>吸筹：低位集中</li><li>派发：高位密集</li></ul>`,
-    },
-    {
-        id: 10,
-        icon: '🔄',
-        title: '波浪理论',
-        level: '高级',
-        category: 'strategy',
-        desc: '5浪上涨3浪回调的市场运行规律。',
-        detail: `<h3>波浪理论</h3><ul><li>推动浪：1、3、5浪</li><li>调整浪：2、4浪</li><li>回调：A、B、C浪</li></ul><p>实践中争议较大，建议结合其他指标。</p>`,
-    },
-]
+function openPost(post: LearnPost): void {
+    if (post.type === 'article') {
+        currentArticle.value = post
+        showArticle.value = true
+        document.body.style.overflow = 'hidden'
+    } else {
+        currentVideo.value = post
+        showVideo.value = true
+    }
+}
 
-const filteredTopics = computed(() => {
-    const category = learnStore.category
-    if (category === 'all') return topics
-    return topics.filter((t) => t.category === category)
+function pauseArticleMedia(): void {
+    articleContentRef.value
+        ?.querySelectorAll('video, audio')
+        .forEach((el) => {
+            const media = el as HTMLMediaElement
+            media.pause()
+            media.currentTime = 0
+        })
+}
+
+function closeArticle(): void {
+    pauseArticleMedia()
+    showArticle.value = false
+    document.body.style.overflow = ''
+}
+
+function onVideoClose(): void {
+    if (videoRef.value) {
+        videoRef.value.pause()
+        videoRef.value.currentTime = 0
+    }
+    currentVideo.value = null
+}
+
+watch(showVideo, async (open) => {
+    if (open) {
+        await nextTick()
+        videoRef.value?.play().catch(() => {})
+    }
 })
 </script>
 
@@ -176,47 +215,95 @@ const filteredTopics = computed(() => {
     min-width: 0;
 }
 
-@media (max-width: 480px) {
-    .learn-card-header {
-        flex-wrap: wrap;
-    }
-
-    .topic-title {
-        min-width: 0;
-    }
+.feed-masonry {
+    column-gap: 10px;
 }
 
-.page-intro {
-    margin-bottom: 24px;
+.feed-card {
+    break-inside: avoid;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
 }
 
-.learn-card-inner {
-    padding: 16px 18px;
+.feed-cover {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-muted);
 }
 
-.learn-card-header {
+.feed-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.feed-level {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 100px;
+    backdrop-filter: blur(4px);
+}
+
+.feed-video-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.topic-icon {
-    font-size: 20px;
-}
-
-.topic-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    flex: 1;
-}
-
-.topic-level {
-    font-size: 11px;
-    font-weight: 500;
+    gap: 4px;
     padding: 3px 8px;
     border-radius: 100px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.feed-body {
+    padding: 10px 10px 12px;
+}
+
+.feed-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.45;
+    margin: 0 0 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.feed-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.feed-author {
+    font-size: 11px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.feed-likes {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 .badge-初级 {
@@ -234,46 +321,173 @@ const filteredTopics = computed(() => {
     background: var(--color-up-bg);
 }
 
-.topic-desc {
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 0;
+/* ── 图文详情全屏层 ── */
+.article-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
 }
 
-.modal-content {
-    color: var(--text-secondary);
-    line-height: 1.8;
+.article-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
 }
 
-.modal-level {
-    display: inline-block;
+.article-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--surface-muted);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.article-back:hover {
+    background: var(--bg-card-hover);
+}
+
+.article-header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.article-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.article-content-wrap {
+    padding: 20px 16px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.article-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
     margin-bottom: 12px;
 }
 
-.modal-content :deep(h3) {
-    color: var(--gold-primary);
-    margin: 14px 0 6px;
-    font-size: 15px;
+.article-author-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
-.modal-content :deep(h4) {
-    color: var(--gold-light);
-    margin: 10px 0 4px;
+.article-author {
     font-size: 13px;
+    color: var(--text-muted);
 }
 
-.modal-content :deep(ul) {
-    padding-left: 18px;
-    margin: 6px 0;
+.article-level {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 100px;
 }
 
-.modal-content :deep(li) {
-    margin: 3px 0;
+.article-content {
     color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 14px;
 }
 
-.modal-content :deep(b) {
+.article-content :deep(h3) {
+    color: var(--gold-primary);
+    margin: 18px 0 8px;
+    font-size: 16px;
+}
+
+.article-content :deep(h4) {
+    color: var(--gold-light);
+    margin: 14px 0 6px;
+    font-size: 14px;
+}
+
+.article-content :deep(ul) {
+    padding-left: 18px;
+    margin: 8px 0;
+}
+
+.article-content :deep(li) {
+    margin: 4px 0;
+}
+
+.article-content :deep(b) {
     color: var(--text-primary);
+}
+
+.article-content :deep(p) {
+    margin: 8px 0;
+}
+
+.article-content :deep(img) {
+    width: 100%;
+    border-radius: var(--radius-md);
+    margin: 16px 0;
+    display: block;
+}
+
+.article-content :deep(video) {
+    width: 100%;
+    border-radius: var(--radius-md);
+    margin: 16px 0;
+    background: #000;
+    display: block;
+}
+
+.article-content :deep(audio) {
+    width: 100%;
+    margin: 12px 0;
+    display: block;
+}
+
+/* ── 视频播放 ── */
+.video-player-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.video-player {
+    width: 100%;
+    border-radius: var(--radius-md);
+    background: #000;
+    aspect-ratio: 16 / 9;
+}
+
+.video-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ── 过渡动画 ── */
+.detail-fade-enter-active,
+.detail-fade-leave-active {
+    transition: opacity 0.25s ease;
+}
+
+.detail-fade-enter-from,
+.detail-fade-leave-to {
+    opacity: 0;
 }
 </style>
