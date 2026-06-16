@@ -431,7 +431,7 @@ function handleReset() {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 900px;
+    width: 100%;
 }
 
 .settings-card {
