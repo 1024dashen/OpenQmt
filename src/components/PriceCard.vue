@@ -143,6 +143,7 @@ function formatVolume(val: number): string {
 
 function formatAmount(val: number): string {
     if (!val) return '--'
+    if (val >= 1000000000000) return (val / 1000000000000).toFixed(1) + '万亿'
     if (val >= 100000000) return (val / 100000000).toFixed(2) + '亿'
     if (val >= 10000) return (val / 10000).toFixed(2) + '万'
     return val.toString()
