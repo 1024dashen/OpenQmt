@@ -14,23 +14,51 @@ export interface QuoteData {
 /** 品种配置 */
 export interface SymbolConfig {
     name: string
-    secid: string
+    secid?: string
     unit?: string
     icon: string
+    decimals?: number
 }
 
 /** 黄金品种 key */
 export type GoldKey =
-    | 'shanghai_gold'
-    | 'jcb_gold'
-    | 'london_gold'
-    | 'london_silver'
+    | 'shj'
+    | 'jdj'
+    | 'llj'
+    | 'lly'
+
+/** 黄金行情单项（yun API 响应字段） */
+export interface GoldPriceItem {
+    name: string
+    price: string | number
+    open: string | number
+    close: string | number
+    high: string | number
+    low: string | number
+    time: string
+}
+
+/** 黄金行情 API 响应 */
+export interface GoldApiResponse {
+    lljPrice: GoldPriceItem
+    llyPrice: GoldPriceItem
+    shjPrice: GoldPriceItem
+    shyPrice: GoldPriceItem
+    jdjPrice: GoldPriceItem
+    isWeekend: boolean
+}
 
 /** 股票指数 key */
 export type StockKey = 'sh000001' | 'sz399006' | 'hsi' | 'ndx'
 
 /** 黄金行情数据映射 */
 export type GoldDataMap = Partial<Record<GoldKey, QuoteData>>
+
+/** 黄金行情获取结果 */
+export interface GoldFetchResult {
+    data: GoldDataMap
+    isWeekend: boolean
+}
 
 /** 股票行情数据映射 */
 export type StockDataMap = Partial<Record<StockKey, QuoteData>>

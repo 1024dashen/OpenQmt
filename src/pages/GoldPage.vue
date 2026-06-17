@@ -8,6 +8,7 @@
                     :name="config.name"
                     :icon="config.icon"
                     :unit="config.unit"
+                    :decimals="config.decimals"
                     :current="store.data[key]?.current ?? 0"
                     :open="store.data[key]?.open ?? 0"
                     :high="store.data[key]?.high ?? 0"

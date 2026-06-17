@@ -18,6 +18,16 @@
                 刷新
             </n-button>
 
+            <n-tag
+                v-if="pageType === 'gold' && goldStore.isWeekend"
+                size="small"
+                :bordered="false"
+                type="warning"
+                class="weekend-tag"
+            >
+                周末休市
+            </n-tag>
+
             <n-switch
                 v-if="pageType !== 'fund'"
                 v-model:value="autoRefresh"
@@ -77,7 +87,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { NSpace, NButton, NSwitch, NSelect } from 'naive-ui'
+import { NSpace, NButton, NSwitch, NSelect, NTag } from 'naive-ui'
 import { useGoldStore } from '../stores/gold'
 import { useStockStore } from '../stores/stock'
 import { useFundStore } from '../stores/fund'
@@ -159,10 +169,18 @@ function clearTimer() {
 function startAutoRefresh() {
     clearTimer()
     if (!autoRefresh.value || pageType.value === 'fund') return
+    // 周末黄金休市，不再自动刷新
+    if (pageType.value === 'gold' && goldStore.isWeekend) return
     timer = setInterval(refresh, 10000)
 }
 
 watch(autoRefresh, startAutoRefresh)
+
+watch(() => goldStore.isWeekend, (isWeekend) => {
+    if (isWeekend && pageType.value === 'gold') {
+        clearTimer()
+    }
+})
 
 watch(
     pageType,

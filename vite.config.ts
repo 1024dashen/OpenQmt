@@ -1,11 +1,19 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import path from "path";
+
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig(async () => ({
   plugins: [vue()],
   clearScreen: false,
+  resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+            '@root': path.resolve(__dirname, './'),
+        },
+    },
   server: {
     port: 1421,
     strictPort: true,

@@ -1,7 +1,7 @@
 /**
  * OpenQmt 行情数据 API 模块
- * 使用东方财富 Push2 API 获取实时行情数据
- * Tauri 环境通过 httpFetch 绕过 CORS；浏览器开发走 Vite 代理
+ * 黄金行情：使用 Yun API 获取实时数据
+ * 股票/基金：使用东方财富 Push2 API
  */
 
 import {
@@ -9,6 +9,7 @@ import {
   getEastMoneyQuoteUrl,
   getFundRankUrl,
 } from "../utils/http";
+import yunApi from "../api/yun";
 import type {
   QuoteData,
   SymbolConfig,
@@ -18,6 +19,9 @@ import type {
   StockDataMap,
   FundRankItem,
   EastMoneyResponse,
+  GoldApiResponse,
+  GoldPriceItem,
+  GoldFetchResult,
 } from "../types";
 
 const COMMON_PARAMS: Record<string, string> = {
@@ -28,29 +32,27 @@ const COMMON_PARAMS: Record<string, string> = {
 
 /** 黄金品种配置 */
 export const GOLD_CONFIG: Record<GoldKey, SymbolConfig> = {
-  shanghai_gold: {
-    name: "上海黄金",
-    secid: "118.Au99.99",
+  shj: {
+    name: "沪金",
     unit: "元/克",
     icon: "🪙",
+    decimals: 2,
   },
-  jcb_gold: {
+  jdj: {
     name: "积存金",
-    secid: "118.Au99.95",
     unit: "元/克",
     icon: "🏦",
+    decimals: 2,
   },
-  london_gold: {
+  llj: {
     name: "伦敦金",
-    secid: "133.XAUUSD",
-    unit: "美元/盎司",
     icon: "🌍",
+    decimals: 2,
   },
-  london_silver: {
+  lly: {
     name: "伦敦银",
-    secid: "133.XAGUSD",
-    unit: "美元/盎司",
-    icon: "🥈",
+    icon: "🌐",
+    decimals: 3,
   },
 };
 
@@ -81,10 +83,10 @@ export const STOCK_CONFIG: Record<StockKey, SymbolConfig> = {
 // ============ 模拟数据 ============
 
 const MOCK_GOLD: GoldDataMap = {
-  shanghai_gold: { name: "上海黄金", current: 568.50, open: 567.20, high: 570.80, low: 566.10, change: 1.30, changePercent: 0.23, volume: 12850, amount: 7296800 },
-  jcb_gold: { name: "积存金", current: 570.12, open: 568.80, high: 572.50, low: 567.90, change: 1.32, changePercent: 0.23, volume: 8920, amount: 5085600 },
-  london_gold: { name: "伦敦金", current: 2645.30, open: 2640.50, high: 2652.80, low: 2638.20, change: 4.80, changePercent: 0.18, volume: 156800, amount: 415020000 },
-  london_silver: { name: "伦敦银", current: 31.25, open: 31.10, high: 31.50, low: 30.95, change: 0.15, changePercent: 0.48, volume: 85200, amount: 2662500 },
+  shj: { name: "沪金", current: 940.00, open: 941.00, high: 945.80, low: 937.00, change: 0.20, changePercent: 0.02, volume: 0, amount: 0 },
+  jdj: { name: "积存金", current: 939.83, open: 940.78, high: 942.50, low: 938.50, change: 0.00, changePercent: 0.00, volume: 0, amount: 0 },
+  llj: { name: "伦敦金", current: 4328.31, open: 4335.07, high: 4349.41, low: 4317.41, change: -6.77, changePercent: -0.16, volume: 0, amount: 0 },
+  lly: { name: "伦敦银", current: 70.276, open: 70.026, high: 70.490, low: 69.720, change: 0.247, changePercent: 0.35, volume: 0, amount: 0 },
 };
 
 const MOCK_STOCK: StockDataMap = {
@@ -150,44 +152,61 @@ async function fetchQuote(secid: string): Promise<QuoteData | null> {
   }
 }
 
+/** 将 yun API 单项数据转为 QuoteData */
+function parseGoldPriceItem(item: GoldPriceItem): QuoteData {
+  const price = typeof item.price === "string" ? parseFloat(item.price) : item.price;
+  const open = typeof item.open === "string" ? parseFloat(item.open) : item.open;
+  const closeVal = typeof item.close === "string" ? parseFloat(item.close) : item.close;
+  const high = typeof item.high === "string" ? parseFloat(item.high) : item.high;
+  const low = typeof item.low === "string" ? parseFloat(item.low) : item.low;
+  const change = price - closeVal;
+  const changePercent = closeVal !== 0 ? (change / closeVal) * 100 : 0;
+  return {
+    name: item.name,
+    current: price,
+    open,
+    high,
+    low,
+    change,
+    changePercent,
+    volume: 0,
+    amount: 0,
+  };
+}
+
 // ============ 对外接口 ============
 
 /** 获取黄金行情数据 */
-export async function fetchGoldData(): Promise<GoldDataMap> {
-  const results: GoldDataMap = {};
-  const entries = Object.entries(GOLD_CONFIG) as [GoldKey, SymbolConfig][];
+export async function fetchGoldData(): Promise<GoldFetchResult> {
+  try {
+    const resp = await yunApi.getLLGold();
+    const raw: GoldApiResponse = resp.data;
 
-  const promises = entries.map(async ([key, config]) => {
-    const data = await fetchQuote(config.secid);
-    if (data && data.current > 0) {
-      results[key] = { ...data, name: config.name };
-    }
-  });
-
-  await Promise.all(promises);
-
-  // 如果完全没有获取到真实数据，使用模拟数据
-  if (Object.keys(results).length === 0) {
-    return { ...MOCK_GOLD };
-  }
-
-  // 积存金特殊处理：未获取到时用上海黄金价格加溢价
-  if (!results.jcb_gold && results.shanghai_gold) {
-    const s = results.shanghai_gold;
-    results.jcb_gold = {
-      name: "积存金",
-      current: +(s.current * 1.003).toFixed(2),
-      open: +(s.open * 1.003).toFixed(2),
-      high: +(s.high * 1.003).toFixed(2),
-      low: +(s.low * 1.003).toFixed(2),
-      change: +(s.change * 1.003).toFixed(2),
-      changePercent: s.changePercent,
-      volume: 0,
-      amount: 0,
+    const results: GoldDataMap = {};
+    const keyMap: Record<string, GoldKey> = {
+      shjPrice: "shj",
+      jdjPrice: "jdj",
+      lljPrice: "llj",
+      llyPrice: "lly",
     };
-  }
 
-  return results;
+    for (const [apiKey, goldKey] of Object.entries(keyMap)) {
+      const item = raw[apiKey as keyof GoldApiResponse];
+      if (item && typeof item === "object" && "price" in item) {
+        results[goldKey] = parseGoldPriceItem(item as GoldPriceItem);
+      }
+    }
+
+    // 如果完全没有获取到真实数据，使用模拟数据
+    if (Object.keys(results).length === 0) {
+      return { data: { ...MOCK_GOLD }, isWeekend: false };
+    }
+
+    return { data: results, isWeekend: raw.isWeekend ?? false };
+  } catch (e) {
+    console.warn("获取黄金行情失败:", e);
+    return { data: { ...MOCK_GOLD }, isWeekend: false };
+  }
 }
 
 /** 获取股票指数行情数据 */
@@ -196,6 +215,7 @@ export async function fetchStockData(): Promise<StockDataMap> {
   const entries = Object.entries(STOCK_CONFIG) as [StockKey, SymbolConfig][];
 
   const promises = entries.map(async ([key, config]) => {
+    if (!config.secid) return;
     const data = await fetchQuote(config.secid);
     if (data && data.current > 0) {
       results[key] = { ...data, name: config.name };
