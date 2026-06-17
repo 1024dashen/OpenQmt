@@ -6,18 +6,6 @@
             :size="10"
             class="toolbar-actions"
         >
-            <n-button
-                size="small"
-                round
-                @click="refresh"
-                :loading="loading"
-            >
-                <template #icon>
-                    <span style="font-size: 14px">↻</span>
-                </template>
-                刷新
-            </n-button>
-
             <n-tag
                 v-if="pageType === 'gold' && goldStore.isWeekend"
                 size="small"
@@ -27,16 +15,6 @@
             >
                 周末休市
             </n-tag>
-
-            <n-switch
-                v-if="pageType !== 'fund'"
-                v-model:value="autoRefresh"
-                size="small"
-                class="toolbar-switch"
-            >
-                <template #checked>自动刷新</template>
-                <template #unchecked>手动</template>
-            </n-switch>
 
             <n-select
                 v-if="pageType === 'fund'"
@@ -77,17 +55,13 @@
                 @update:value="onModelChange"
             />
         </n-space>
-
-        <!-- <span v-if="lastUpdate" class="update-time num-mono">{{
-            lastUpdate
-        }}</span> -->
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { NSpace, NButton, NSwitch, NSelect, NTag } from 'naive-ui'
+import { NSpace, NSelect, NTag } from 'naive-ui'
 import { useGoldStore } from '../stores/gold'
 import { useStockStore } from '../stores/stock'
 import { useFundStore } from '../stores/fund'
@@ -116,7 +90,6 @@ const pageType = computed(() => {
     return null
 })
 
-const autoRefresh = ref(true)
 const fundType = ref('all')
 let timer: ReturnType<typeof setInterval> | null = null
 
@@ -134,20 +107,6 @@ const learnCategoryOptions = [
     { label: '基础概念', value: 'basic' },
     { label: '投资策略', value: 'strategy' },
 ]
-
-const loading = computed(() => {
-    if (pageType.value === 'gold') return goldStore.loading
-    if (pageType.value === 'stock') return stockStore.loading
-    if (pageType.value === 'fund') return fundStore.loading
-    return false
-})
-
-const lastUpdate = computed(() => {
-    if (pageType.value === 'gold') return goldStore.lastUpdate
-    if (pageType.value === 'stock') return stockStore.lastUpdate
-    if (pageType.value === 'fund') return fundStore.lastUpdate
-    return ''
-})
 
 function refresh() {
     if (pageType.value === 'gold') goldStore.loadData()
@@ -168,13 +127,11 @@ function clearTimer() {
 
 function startAutoRefresh() {
     clearTimer()
-    if (!autoRefresh.value || pageType.value === 'fund') return
+    if (pageType.value === 'fund') return
     // 周末黄金休市，不再自动刷新
     if (pageType.value === 'gold' && goldStore.isWeekend) return
-    timer = setInterval(refresh, 10000)
+    timer = setInterval(refresh, 2000)
 }
-
-watch(autoRefresh, startAutoRefresh)
 
 watch(() => goldStore.isWeekend, (isWeekend) => {
     if (isWeekend && pageType.value === 'gold') {
