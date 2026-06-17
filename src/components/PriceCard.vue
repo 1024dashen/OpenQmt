@@ -46,10 +46,6 @@
                     <span class="footer-label">成交额</span>
                     <span class="footer-value num-mono">{{ formatAmount(amount) }}</span>
                 </div>
-                <div class="footer-item" v-if="passionTemp">
-                    <span class="footer-label" :title="passionTempIntro">温度</span>
-                    <span class="footer-value" :class="passionLevel(passionTemp)" :title="passionTempIntro">{{ passionTemp }}°<span class="footer-desc">({{ tempDesc(passionTemp) }})</span></span>
-                </div>
                 <div class="footer-item" v-if="passionValuation">
                     <span class="footer-label">估值</span>
                     <span class="footer-value" :class="passionLevel(passionValuation)">{{ passionValuation }}<span class="footer-desc">({{ valuationDesc(passionValuation) }})</span></span>
@@ -57,6 +53,10 @@
                 <div class="footer-item" v-if="passionSentiment">
                     <span class="footer-label">情绪</span>
                     <span class="footer-value" :class="passionLevel(passionSentiment)">{{ passionSentiment }}<span class="footer-desc">({{ sentimentDesc(passionSentiment) }})</span></span>
+                </div>
+                <div class="footer-item" v-if="passionTemp">
+                    <span class="footer-label" :title="passionTempIntro">温度</span>
+                    <span class="footer-value" :class="passionLevel(passionTemp)" :title="passionTempIntro">{{ passionTemp }}°<span class="footer-desc">({{ tempDesc(passionTemp) }})</span></span>
                 </div>
             </div>
         </div>
