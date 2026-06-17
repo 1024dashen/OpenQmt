@@ -17,6 +17,9 @@
           :changePercent="store.data[key]?.changePercent ?? 0"
           :volume="store.data[key]?.volume ?? 0"
           :amount="store.data[key]?.amount ?? 0"
+          :passionTemp="getPassion(key)?.temp"
+          :passionValuation="getPassion(key)?.valuation"
+          :passionSentiment="getPassion(key)?.sentiment"
         />
       </div>
     </n-spin>
@@ -65,12 +68,25 @@ import { computed } from "vue";
 import { useStockStore } from "../stores/stock";
 import { useBreakpoint } from "../composables/useBreakpoint";
 import PriceCard from "../components/PriceCard.vue";
-import type { StockKey, SymbolConfig, QuoteData } from "../types";
+import type { StockKey, SymbolConfig, QuoteData, PassionItem } from "../types";
 
 const store = useStockStore();
 const { isMobile } = useBreakpoint();
 const detailCols = computed(() => (isMobile.value ? 1 : 2));
 const stockConfig = store.getConfig() as Record<StockKey, SymbolConfig>;
+
+/** StockKey → market 映射 */
+const stockMarketMap: Record<StockKey, string> = {
+  sh: "CN",
+  cy: "CN",
+  hk: "HK",
+  us: "US",
+};
+
+function getPassion(key: StockKey): PassionItem | undefined {
+  const market = stockMarketMap[key];
+  return store.passion.find((p) => p.market === market);
+}
 
 function priceColor(key: StockKey): string {
   const d = store.data[key];

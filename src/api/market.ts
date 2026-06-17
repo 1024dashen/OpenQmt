@@ -23,6 +23,7 @@ import type {
   StockApiResponse,
   StockPriceItem,
   StockFetchResult,
+  PassionItem,
 } from "../types";
 
 /** 黄金品种配置 */
@@ -224,6 +225,17 @@ export async function fetchStockData(): Promise<StockFetchResult> {
   } catch (e) {
     console.warn("获取股票行情失败:", e);
     return { data: { ...MOCK_STOCK }, isWeekend: false };
+  }
+}
+
+/** 获取股票情绪数据 */
+export async function fetchStockPassion(): Promise<PassionItem[]> {
+  try {
+    const resp = await yunApi.getPassion();
+    return resp.data as PassionItem[];
+  } catch (e) {
+    console.warn("获取股票情绪失败:", e);
+    return [];
   }
 }
 

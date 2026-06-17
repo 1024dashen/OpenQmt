@@ -91,6 +91,17 @@ export interface StockFetchResult {
     isWeekend: boolean
 }
 
+/** 股票情绪单项（yun API passion 响应字段） */
+export interface PassionItem {
+    temp: string
+    temp_intro: string
+    valuation: string
+    sentiment: string
+    market: string
+    updated_at: string
+    updated_unix: string
+}
+
 /** 基金排行条目 */
 export interface FundRankItem {
     rank: number

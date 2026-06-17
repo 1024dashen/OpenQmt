@@ -35,18 +35,28 @@
                             formatPrice(open)
                         }}</span>
                     </div>
-                    <div class="detail-item" v-if="volume">
-                        <span class="detail-label">成交量</span>
-                        <span class="detail-value num-mono">{{
-                            formatVolume(volume)
-                        }}</span>
-                    </div>
-                    <div class="detail-item" v-if="amount">
-                        <span class="detail-label">成交额</span>
-                        <span class="detail-value num-mono">{{
-                            formatAmount(amount)
-                        }}</span>
-                    </div>
+                </div>
+            </div>
+            <div class="card-footer" v-if="volume || amount || hasPassion">
+                <div class="footer-item" v-if="volume">
+                    <span class="footer-label">成交量</span>
+                    <span class="footer-value num-mono">{{ formatVolume(volume) }}</span>
+                </div>
+                <div class="footer-item" v-if="amount">
+                    <span class="footer-label">成交额</span>
+                    <span class="footer-value num-mono">{{ formatAmount(amount) }}</span>
+                </div>
+                <div class="footer-item" v-if="passionTemp">
+                    <span class="footer-label">温度</span>
+                    <span class="footer-value" :class="passionLevel(passionTemp)">{{ passionTemp }}°</span>
+                </div>
+                <div class="footer-item" v-if="passionValuation">
+                    <span class="footer-label">估值</span>
+                    <span class="footer-value" :class="passionLevel(passionValuation)">{{ passionValuation }}</span>
+                </div>
+                <div class="footer-item" v-if="passionSentiment">
+                    <span class="footer-label">情绪</span>
+                    <span class="footer-value" :class="passionLevel(passionSentiment)">{{ passionSentiment }}</span>
                 </div>
             </div>
         </div>
@@ -70,6 +80,9 @@ const props = withDefaults(
         volume?: number
         amount?: number
         decimals?: number
+        passionTemp?: string
+        passionValuation?: string
+        passionSentiment?: string
     }>(),
     {
         icon: '',
@@ -83,6 +96,9 @@ const props = withDefaults(
         volume: 0,
         amount: 0,
         decimals: 2,
+        passionTemp: '',
+        passionValuation: '',
+        passionSentiment: '',
     }
 )
 
@@ -130,6 +146,16 @@ function formatAmount(val: number): string {
     if (val >= 100000000) return (val / 100000000).toFixed(2) + '亿'
     if (val >= 10000) return (val / 10000).toFixed(2) + '万'
     return val.toString()
+}
+
+const hasPassion = computed(() => !!(props.passionTemp || props.passionValuation || props.passionSentiment))
+
+function passionLevel(val: string): string {
+    const n = parseInt(val, 10)
+    if (isNaN(n)) return ''
+    if (n >= 80) return 'hot'
+    if (n >= 50) return 'warm'
+    return 'cool'
 }
 </script>
 
@@ -263,6 +289,50 @@ function formatAmount(val: number): string {
 }
 
 .detail-value.price-down {
+    color: var(--color-down);
+}
+
+.card-footer {
+    display: flex;
+    gap: 0;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+.footer-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.footer-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-value.hot {
+    color: var(--color-up);
+}
+
+.footer-value.warm {
+    color: #f59e0b;
+}
+
+.footer-value.cool {
     color: var(--color-down);
 }
 
