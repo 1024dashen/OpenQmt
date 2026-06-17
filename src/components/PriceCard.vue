@@ -7,38 +7,34 @@
                 <span class="card-name">{{ name }}</span>
                 <span class="card-unit" v-if="unit">{{ unit }}</span>
             </div>
-            <div class="card-price-row">
-                <span class="card-price num-mono" :class="priceClass">{{
-                    formatPrice(current)
-                }}</span>
-                <span class="card-change-pill num-mono" :class="priceClass">{{
-                    changeStr
-                }}</span>
-            </div>
-            <div class="card-detail">
-                <div class="detail-item">
-                    <span class="detail-label">开盘</span>
-                    <span class="detail-value num-mono">{{
-                        formatPrice(open)
+            <div class="card-content">
+                <div class="card-left">
+                    <span class="card-price num-mono" :class="priceClass">{{
+                        formatPrice(current)
+                    }}</span>
+                    <span class="card-change num-mono" :class="priceClass">{{
+                        changeStr
                     }}</span>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">最高</span>
-                    <span class="detail-value num-mono" :class="highClass">{{
-                        formatPrice(high)
-                    }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">最低</span>
-                    <span class="detail-value num-mono" :class="lowClass">{{
-                        formatPrice(low)
-                    }}</span>
-                </div>
-                <div class="detail-item" v-if="volume > 0">
-                    <span class="detail-label">成交量</span>
-                    <span class="detail-value num-mono">{{
-                        formatVolume(volume)
-                    }}</span>
+                <div class="card-right">
+                    <div class="detail-item">
+                        <span class="detail-label">最高</span>
+                        <span class="detail-value num-mono" :class="highClass">{{
+                            formatPrice(high)
+                        }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">最低</span>
+                        <span class="detail-value num-mono" :class="lowClass">{{
+                            formatPrice(low)
+                        }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">开盘</span>
+                        <span class="detail-value num-mono">{{
+                            formatPrice(open)
+                        }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,7 +123,7 @@ function formatVolume(val: number): string {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .status-dot {
@@ -167,16 +163,22 @@ function formatVolume(val: number): string {
     border-radius: 100px;
 }
 
-.card-price-row {
+.card-content {
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
 }
 
 .card-price {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
     line-height: 1.1;
     letter-spacing: -0.03em;
@@ -192,42 +194,33 @@ function formatVolume(val: number): string {
     color: var(--text-primary);
 }
 
-.card-change-pill {
-    font-size: 11px;
+.card-change {
+    font-size: 12px;
     font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 100px;
-    white-space: nowrap;
 }
 
-.card-change-pill.up {
+.card-change.up {
     color: var(--color-up);
-    background: var(--color-up-bg);
 }
-
-.card-change-pill.down {
+.card-change.down {
     color: var(--color-down);
-    background: var(--color-down-bg);
 }
-
-.card-change-pill.flat {
+.card-change.flat {
     color: var(--color-flat);
-    background: var(--surface-muted);
 }
 
-.card-detail {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-subtle);
+.card-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .detail-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 10px;
     min-width: 0;
 }
 
@@ -243,6 +236,7 @@ function formatVolume(val: number): string {
     font-size: 12px;
     font-weight: 500;
     text-align: right;
+    min-width: 48px;
 }
 
 .detail-value.price-up {
