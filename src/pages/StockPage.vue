@@ -111,7 +111,6 @@ function formatChange(d: QuoteData | undefined): string {
 
 <style scoped>
 .stock-page {
-  max-width: 1200px;
   width: 100%;
   min-width: 0;
 }
