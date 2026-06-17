@@ -62,9 +62,6 @@
                                 </template>
                             </n-button>
                             <span class="header-title">{{ currentTitle }}</span>
-                            <span class="header-badge" v-if="pageLoading"
-                                >更新中...</span
-                            >
                             <PageToolbar v-if="showPageToolbar" />
                         </div>
                         <div class="header-right">
