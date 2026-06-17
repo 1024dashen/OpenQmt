@@ -17,14 +17,12 @@
                     @scroll="onTableScroll"
                 />
             </div>
-            <div class="load-more-sentinel">
+            <div
+                v-if="store.loadingMore || (!store.hasMore && store.data.length)"
+                class="load-more-sentinel"
+            >
                 <n-spin v-if="store.loadingMore" size="small" />
-                <span
-                    v-else-if="!store.hasMore && store.data.length"
-                    class="load-more-end"
-                >
-                    已加载全部
-                </span>
+                <span v-else class="load-more-end">已加载全部</span>
             </div>
         </n-spin>
     </div>
@@ -321,7 +319,6 @@ function rowClassName(): string {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 40px;
     padding: 8px 0 0;
 }
 
