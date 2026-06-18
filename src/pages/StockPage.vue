@@ -5,6 +5,7 @@
                 <PriceCard
                     v-for="(config, key) in stockConfig"
                     :key="key"
+                    clickable
                     :name="config.name"
                     :icon="config.icon"
                     unit="点"
@@ -21,6 +22,7 @@
                     :passionTempIntro="getPassion(key)?.temp_intro"
                     :passionValuation="getPassion(key)?.valuation"
                     :passionSentiment="getPassion(key)?.sentiment"
+                    @click="goDetail(key as StockKey)"
                 />
             </div>
         </n-spin>
@@ -110,11 +112,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useStockStore } from '../stores/stock'
 import { useBreakpoint } from '../composables/useBreakpoint'
 import PriceCard from '../components/PriceCard.vue'
 import type { StockKey, SymbolConfig, QuoteData, PassionItem } from '../types'
 
+const router = useRouter()
 const store = useStockStore()
 const { isMobile } = useBreakpoint()
 const detailCols = computed(() => (isMobile.value ? 1 : 2))
@@ -152,6 +156,15 @@ function formatChange(d: QuoteData | undefined): string {
     return `${sign}${d.change.toFixed(2)} (${sign}${d.changePercent.toFixed(
         2
     )}%)`
+}
+
+function goDetail(key: StockKey): void {
+    const config = stockConfig[key]
+    router.push({
+        name: 'StockDetail',
+        params: { key },
+        query: { name: config?.name },
+    })
 }
 </script>
 

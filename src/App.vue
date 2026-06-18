@@ -38,7 +38,7 @@
                     <n-layout-header :bordered="false" class="app-header">
                         <div class="header-left">
                             <n-button
-                                v-if="isInSettingsArea || isFundDetailPage"
+                                v-if="isInSettingsArea || isFundDetailPage || isStockDetailPage"
                                 quaternary
                                 circle
                                 size="small"
@@ -251,6 +251,7 @@ const isInSettingsArea = computed(() => {
 })
 
 const isFundDetailPage = computed(() => route.path.startsWith('/fund/'))
+const isStockDetailPage = computed(() => route.path.startsWith('/stock/'))
 
 // ── Naive UI 主题 ──
 const naiveTheme = computed(() => (themeStore.isDark ? darkTheme : null))
@@ -449,6 +450,10 @@ function handleBack() {
         router.push('/fund')
         return
     }
+    if (isStockDetailPage.value) {
+        router.push('/stock')
+        return
+    }
     backToMain()
 }
 
@@ -466,11 +471,15 @@ const currentTitle = computed(() => {
         const name = route.query.name
         return typeof name === 'string' && name ? name : '基金详情'
     }
+    if (isStockDetailPage.value) {
+        const name = route.query.name
+        return typeof name === 'string' && name ? name : '大盘详情'
+    }
     return titleMap[activeKey.value] || '个人中心'
 })
 
 const showPageToolbar = computed(() => {
-    if (isFundDetailPage.value) return false
+    if (isFundDetailPage.value || isStockDetailPage.value) return false
     return ['gold', 'stock', 'fund', 'learn', 'ai'].includes(activeKey.value)
 })
 
@@ -502,6 +511,10 @@ watch(
         }
         if (path.startsWith('/fund/')) {
             activeKey.value = 'fund'
+            return
+        }
+        if (path.startsWith('/stock/')) {
+            activeKey.value = 'stock'
             return
         }
         const key = path.replace('/', '') || 'gold'

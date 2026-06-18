@@ -1,5 +1,9 @@
 <template>
-    <div class="price-card-wrap surface-card">
+    <div
+        class="price-card-wrap surface-card"
+        :class="{ clickable }"
+        @click="handleClick"
+    >
         <div class="card-body">
             <div class="card-header">
                 <span class="status-dot" :class="priceClass"></span>
@@ -84,6 +88,7 @@ const props = withDefaults(
         passionTempIntro?: string
         passionValuation?: string
         passionSentiment?: string
+        clickable?: boolean
     }>(),
     {
         icon: '',
@@ -101,8 +106,17 @@ const props = withDefaults(
         passionTempIntro: '',
         passionValuation: '',
         passionSentiment: '',
+        clickable: false,
     }
 )
+
+const emit = defineEmits<{
+    click: []
+}>()
+
+function handleClick() {
+    if (props.clickable) emit('click')
+}
 
 const isUp = computed(() => props.change > 0)
 const isDown = computed(() => props.change < 0)
@@ -190,6 +204,16 @@ function sentimentDesc(val: string): string {
 </script>
 
 <style scoped>
+.price-card-wrap.clickable {
+    cursor: pointer;
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.price-card-wrap.clickable:hover {
+    background: var(--bg-card-hover);
+    box-shadow: var(--shadow-card);
+}
+
 .card-body {
     padding: 14px 16px;
 }
