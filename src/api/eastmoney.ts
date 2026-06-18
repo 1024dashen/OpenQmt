@@ -17,6 +17,7 @@ interface TiantianFundItem {
     quarterReturn: string
     hySyl: string
     yearSyl: string
+    jzrq: string
 }
 
 interface FundSelectResponse {
@@ -54,6 +55,7 @@ function toFundRankItem(item: TiantianFundItem, rank: number): FundRankItem {
         type: item.ftype,
         nav: parseNum(item.perNav),
         accNav: parseNum(item.accPerNav),
+        jzrq: parseNum(item.jzrq),
         dayChange: parseNum(item.daySyl),
         weekChange: parseNum(item.weekSyl),
         monthChange: parseNum(item.monthSyl),
@@ -78,7 +80,7 @@ export function fundTypeToRsfType(type: string): FundRsfType {
 export async function fetchFundRanking(
     pageIndex = 1,
     pageNum = 30,
-    rsfType: FundRsfType = 0
+    rsfType: FundRsfType = 0,
 ): Promise<FundRankingResult> {
     const body = new URLSearchParams({
         orderField: '5_1_-1',
@@ -271,25 +273,31 @@ function parseOptionalNum(val: string | undefined): number | null {
 }
 
 function getLatestDateKey(
-    map: Record<string, unknown> | null | undefined
+    map: Record<string, unknown> | null | undefined,
 ): string | null {
     if (!map) return null
     const keys = Object.keys(map).sort()
     return keys.length ? keys[keys.length - 1]! : null
 }
 
-function mapFundDetail(code: string, raw: FundDetailResponse['data']): FundDetail {
+function mapFundDetail(
+    code: string,
+    raw: FundDetailResponse['data'],
+): FundDetail {
     const reportDate = raw?.expansion ?? ''
     const stocks = raw?.fundInverstPosition?.fundStocks ?? []
-    const sectorDate = reportDate || getLatestDateKey(raw?.fundSectorAllocationByDate)
+    const sectorDate =
+        reportDate || getLatestDateKey(raw?.fundSectorAllocationByDate)
     const sectorList = sectorDate
         ? (raw?.fundSectorAllocationByDate?.[sectorDate] ?? [])
         : []
-    const topicDate = reportDate || getLatestDateKey(raw?.fundStockInvestDistriTop)
+    const topicDate =
+        reportDate || getLatestDateKey(raw?.fundStockInvestDistriTop)
     const topicList = topicDate
         ? (raw?.fundStockInvestDistriTop?.[topicDate] ?? [])
         : []
-    const assetDate = reportDate || getLatestDateKey(raw?.fundAssetAllocationByDate)
+    const assetDate =
+        reportDate || getLatestDateKey(raw?.fundAssetAllocationByDate)
     const assetRaw = assetDate
         ? raw?.fundAssetAllocationByDate?.[assetDate]?.[0]
         : undefined
@@ -343,7 +351,7 @@ function mapFundDetail(code: string, raw: FundDetailResponse['data']): FundDetai
             amount: item.FHFCZ,
         })),
         cashManagementPct: parseOptionalNum(
-            raw?.fundInvestMoneyManagement?.FundAsset?.MPCTNV
+            raw?.fundInvestMoneyManagement?.FundAsset?.MPCTNV,
         ),
     }
 }

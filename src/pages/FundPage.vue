@@ -19,7 +19,9 @@
                 />
             </div>
             <div
-                v-if="store.loadingMore || (!store.hasMore && store.data.length)"
+                v-if="
+                    store.loadingMore || (!store.hasMore && store.data.length)
+                "
                 class="load-more-sentinel"
             >
                 <n-spin v-if="store.loadingMore" size="small" />
@@ -69,7 +71,7 @@ watch(
     () => [store.data.length, store.loading, store.loadingMore] as const,
     ([, loading, loadingMore]) => {
         if (!loading && !loadingMore) checkAndLoadMore()
-    }
+    },
 )
 
 const columns: DataTableColumns<FundRankItem> = [
@@ -92,7 +94,7 @@ const columns: DataTableColumns<FundRankItem> = [
                         fontSize: isTop3 ? '15px' : '13px',
                     },
                 },
-                row.rank
+                row.rank,
             )
         },
     },
@@ -107,7 +109,7 @@ const columns: DataTableColumns<FundRankItem> = [
                     class: 'num-mono',
                     style: { color: 'rgba(212,168,67,0.7)', fontSize: '12px' },
                 },
-                row.code
+                row.code,
             )
         },
     },
@@ -124,7 +126,7 @@ const columns: DataTableColumns<FundRankItem> = [
                         fontSize: '13px',
                     },
                 },
-                row.name
+                row.name,
             )
         },
     },
@@ -141,23 +143,58 @@ const columns: DataTableColumns<FundRankItem> = [
                     type: getTypeColor(row.type),
                     round: true,
                 },
-                { default: () => row.type }
+                { default: () => row.type },
             )
         },
     },
     {
         title: '净值',
         key: 'nav',
-        width: 82,
+        width: 110,
         align: 'right',
         render(row) {
+            const dateStr = row.jzrq
+                ? (() => {
+                      const d = new Date(row.jzrq)
+                      return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                  })()
+                : ''
             return h(
                 'span',
                 {
-                    class: 'num-mono',
-                    style: { color: 'var(--text-secondary)', fontSize: '13px' },
+                    style: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        gap: '4px',
+                    },
                 },
-                row.nav.toFixed(4)
+                [
+                    h(
+                        'span',
+                        {
+                            class: 'num-mono',
+                            style: {
+                                color: 'var(--text-secondary)',
+                                fontSize: '13px',
+                            },
+                        },
+                        row.nav.toFixed(4),
+                    ),
+                    dateStr
+                        ? h(
+                              'span',
+                              {
+                                  class: 'num-mono',
+                                  style: {
+                                      color: 'var(--text-muted)',
+                                      fontSize: '10px',
+                                  },
+                              },
+                              dateStr,
+                          )
+                        : null,
+                ],
             )
         },
     },
@@ -219,14 +256,14 @@ function changeCell(val: number) {
         val > 0
             ? 'var(--color-up)'
             : val < 0
-            ? 'var(--color-down)'
-            : 'var(--color-flat)'
+              ? 'var(--color-down)'
+              : 'var(--color-flat)'
     const bg =
         val > 0
             ? 'var(--color-up-bg)'
             : val < 0
-            ? 'var(--color-down-bg)'
-            : 'transparent'
+              ? 'var(--color-down-bg)'
+              : 'transparent'
     return h(
         'span',
         {
@@ -242,12 +279,12 @@ function changeCell(val: number) {
                 whiteSpace: 'nowrap',
             },
         },
-        `${sign}${val.toFixed(2)}%`
+        `${sign}${val.toFixed(2)}%`,
     )
 }
 
 function getTypeColor(
-    type: string
+    type: string,
 ): 'error' | 'warning' | 'success' | 'info' | 'default' {
     if (type.includes('股票')) return 'error'
     if (type.includes('混合')) return 'warning'

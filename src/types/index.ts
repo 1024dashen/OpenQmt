@@ -21,11 +21,7 @@ export interface SymbolConfig {
 }
 
 /** 黄金品种 key */
-export type GoldKey =
-    | 'shj'
-    | 'jdj'
-    | 'llj'
-    | 'lly'
+export type GoldKey = 'shj' | 'jdj' | 'llj' | 'lly'
 
 /** 黄金行情单项（yun API 响应字段） */
 export interface GoldPriceItem {
@@ -110,6 +106,7 @@ export interface FundRankItem {
     type: string
     nav: number
     accNav: number
+    jzrq: number
     dayChange: number
     weekChange: number
     monthChange: number
