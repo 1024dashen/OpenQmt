@@ -269,6 +269,10 @@ body,
     white-space: nowrap;
 }
 
+.page-toolbar .fund-type-select {
+    width: 100px;
+}
+
 .page-toolbar .learn-category-select {
     width: 128px;
 }
@@ -322,8 +326,11 @@ body,
         display: none;
     }
 
+    .page-toolbar .fund-type-select {
+        width: 100px !important;
+    }
+
     .page-toolbar .n-select,
-    .page-toolbar .fund-type-select,
     .page-toolbar .learn-category-select,
     .page-toolbar .ai-provider-select,
     .page-toolbar .ai-model-select {
