@@ -123,9 +123,8 @@ export async function fetchFundRanking(
     }
 }
 
-const FUND_DETAIL_PATH = '/merge/m/api/jjxqy2'
 const FUND_DETAIL_BASE = import.meta.env.VITE_FUND_DETAIL
-const FUND_DETAIL_URL = `${FUND_DETAIL_BASE}${FUND_DETAIL_PATH}`
+// const FUND_DETAIL_URL =
 function generateDeviceId(): string {
     const chars = '0123456789abcdef'
     let id = ''
@@ -136,11 +135,6 @@ function generateDeviceId(): string {
 }
 
 const FUND_DEVICE_ID = generateDeviceId()
-
-function getFundDetailUrl(): string {
-    if (isTauri()) return FUND_DETAIL_URL
-    return `/api/fund-detail${FUND_DETAIL_PATH}`
-}
 
 export interface FundStockHolding {
     code: string
@@ -367,17 +361,20 @@ export async function fetchFundDetail(fcode: string): Promise<FundDetail> {
         fcode,
     })
 
-    const response = await httpFetch(getFundDetailUrl(), {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json, text/plain, */*',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Origin: 'https://h5.1234567.com.cn',
-            Referer: 'https://h5.1234567.com.cn/',
-            Validmark: FUND_DEVICE_ID,
+    const response = await httpFetch(
+        `${FUND_DETAIL_BASE}$/merge/m/api/jjxqy2`,
+        {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json, text/plain, */*',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Origin: 'https://h5.1234567.com.cn',
+                Referer: 'https://h5.1234567.com.cn/',
+                Validmark: FUND_DEVICE_ID,
+            },
+            body,
         },
-        body,
-    })
+    )
 
     if (!response.ok) {
         throw new Error(`基金详情请求失败: ${response.status}`)
@@ -390,6 +387,48 @@ export async function fetchFundDetail(fcode: string): Promise<FundDetail> {
     }
 
     return mapFundDetail(fcode, json.data)
+}
+
+export async function fetchFundProfile(fcode: string): Promise<any> {
+    const body = new URLSearchParams({
+        deviceid: FUND_DEVICE_ID,
+        version: '9.9.9',
+        appVersion: '6.5.5',
+        product: 'EFund',
+        plat: 'Web',
+        uid: '',
+        fcode,
+        indexfields:
+            '_id,INDEXCODE,BKID,INDEXNAME,INDEXVALUA,NEWINDEXTEXCH,PEP100',
+        fields: 'BENCH,ESTDIFF,INDEXNAME,LINKZSB,INDEXCODE,NEWTEXCH,FTYPE,FCODE,BAGTYPE,RISKLEVEL,TTYPENAME,PTDT_FY,PTDT_TRY,PTDT_TWY,PTDT_Y,DWDT_FY,DWDT_TRY,DWDT_TWY,DWDT_Y,MBDT_FY,MBDT_TRY,MBDT_TWY,MBDT_Y,YDDT_FY,YDDT_TRY,YDDT_TWY,YDDT_Y,BFUNDTYPE,YMATCHCODEA,RLEVEL_SZ,RLEVEL_CX,ESTABDATE,JJGS,JJGSID,ENDNAV,FEGMRQ,SHORTNAME,TTYPE,TJDIN,FUNDEXCHG,LISTTEXCHMARK,FSRQ,ISSBDATE,ISSEDATE,FEATURE,DWJZ,LJJZ,MINRG,RZDF,PERIODNAME,SYL_1N,SYL_LN,SYL_Z,SOURCERATE,RATE,TSRQ,BTYPE,BUY,BENCHCODE,BENCH_CORR,TRKERROR,BENCHRATIO,NEWINDEXTEXCH,BESTDT_STRATEGY,BESTDT_Y,BESTDT_TWY,BESTDT_TRY,BESTDT_FY',
+        fundUniqueInfo_fIELDS:
+            'FCODE,STDDEV1,STDDEV_1NRANK,STDDEV_1NFSC,STDDEV3,STDDEV_3NRANK,STDDEV_3NFSC,STDDEV5,STDDEV_5NRANK,STDDEV_5NFSC,SHARP1,SHARP_1NRANK,SHARP_1NFSC,SHARP3,SHARP_3NRANK,SHARP_3NFSC,SHARP5,SHARP_5NRANK,SHARP_5NFSC,MAXRETRA1,MAXRETRA_1NRANK,MAXRETRA_1NFSC,MAXRETRA3,MAXRETRA_3NRANK,MAXRETRA_3NFSC,MAXRETRA5,MAXRETRA_5NRANK,MAXRETRA_5NFSC,TRKERROR1,TRKERROR_1NRANK,TRKERROR_1NFSC,TRKERROR3,TRKERROR_3NRANK,TRKERROR_3NFSC,TRKERROR5,TRKERROR_5NRANK,TRKERROR_5NFSC',
+        fundUniqueInfo_fLFIELDS:
+            'FCODE,BUSINESSTYPE,BUSINESSTEXT,BUSINESSCODE,BUSINESSSUBTYPE,MARK',
+        cfhFundFInfo_fields: 'INVESTMENTIDEAR,INVESTMENTIDEARIMG',
+        ISRG: '0',
+        relateThemeFields: 'FCODE,SEC_CODE,SEC_NAME,CORR_1Y,OL2TOP',
+    })
+    const response = await httpFetch(
+        `${FUND_DETAIL_BASE}/merge/m/api/jjxqy1_2`,
+        {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json, text/plain, */*',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Origin: 'https://h5.1234567.com.cn',
+                Referer: 'https://h5.1234567.com.cn/',
+                Validmark: FUND_DEVICE_ID,
+            },
+            body,
+        },
+    )
+    if (!response.ok) {
+        throw new Error(`基金档案请求失败: ${response.status}`)
+    }
+    const json = await response.json()
+    console.log('Fund Profile JSON:', json)
+    return json
 }
 
 export default {
