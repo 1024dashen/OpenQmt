@@ -67,8 +67,8 @@
     --color-down-bg: rgba(34, 197, 94, 0.12);
     --color-flat: #828997;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.22),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+    --shadow-card:
+        0 2px 8px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.05);
     --border-hover: rgba(255, 255, 255, 0.12);
     --shadow-glow-gold: none;
     --scrollbar-thumb: rgba(255, 255, 255, 0.14);
@@ -123,13 +123,19 @@ body,
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    font-family:
+        'Inter',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
         sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background var(--transition-normal),
+    transition:
+        background var(--transition-normal),
         color var(--transition-normal);
 }
 
@@ -167,7 +173,6 @@ body,
 }
 
 .num-mono {
-    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
     font-variant-numeric: tabular-nums;
 }
 
@@ -177,8 +182,10 @@ body,
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    transition: border-color var(--transition-fast),
-        box-shadow var(--transition-normal), transform var(--transition-normal);
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 @media (hover: hover) {

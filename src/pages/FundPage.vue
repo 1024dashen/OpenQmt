@@ -152,7 +152,7 @@ const columns: DataTableColumns<FundRankItem> = [
     {
         title: '净值',
         key: 'nav',
-        width: 110,
+        width: 140,
         align: 'center',
         render(row) {
             const dateStr = row.jzrq
