@@ -10,7 +10,7 @@
                     size="small"
                     :scroll-x="900"
                     flex-height
-                    style="height: 80%"
+                    style="height: 100%"
                     :row-class-name="rowClassName"
                     :row-props="rowProps"
                     :pagination="false"
@@ -43,12 +43,11 @@ const store = useFundStore()
 const tableRef = ref<InstanceType<typeof NDataTable> | null>(null)
 
 function onTableScroll(e: Event): void {
-    // const el = e.target as HTMLElement
-    // const { scrollHeight, scrollTop, clientHeight } = el
-    // if (scrollHeight - scrollTop - clientHeight < 200) {
-    //     store.loadMore()
-    // }
-    console.log('table scroll')
+    const el = e.target as HTMLElement
+    const { scrollHeight, scrollTop, clientHeight } = el
+    if (scrollHeight - scrollTop - clientHeight < 200) {
+        store.loadMore()
+    }
 }
 
 function getScrollContainer(): HTMLElement | null {
@@ -319,6 +318,7 @@ function rowProps(row: FundRankItem) {
     padding: var(--content-padding);
     max-width: 100%;
     width: 100%;
+    height: 100%;
     min-width: 0;
     display: flex;
     flex-direction: column;
