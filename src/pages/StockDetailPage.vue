@@ -250,6 +250,7 @@ watch(stockKey, () => {
 .stock-detail-page {
   max-width: 100%;
   min-width: 0;
+  padding: var(--content-padding);
 }
 
 .detail-header {
