@@ -111,7 +111,7 @@ export async function fetchFundRanking(
     }
 
     const json: FundSelectResponse = await response.json()
-
+    console.log('FundSelectResponse:', json)
     if (!json.Succeed || json.ErrCode !== 0) {
         throw new Error(json.Message || '基金排行数据获取失败')
     }

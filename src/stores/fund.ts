@@ -31,11 +31,9 @@ export const useFundStore = defineStore('fund', () => {
             const result = await eastmoneyApi.fetchFundRanking(
                 currentPage.value,
                 pageSize.value,
-                rsfType.value
+                rsfType.value,
             )
-            data.value = reset
-                ? result.items
-                : [...data.value, ...result.items]
+            data.value = reset ? result.items : [...data.value, ...result.items]
             hasMore.value = result.hasMore
             lastUpdate.value = new Date().toLocaleTimeString('zh-CN')
         } catch (e: unknown) {
