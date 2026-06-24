@@ -216,6 +216,7 @@ import { useFundStore } from "./stores/fund";
 import { useAuthStore } from "./stores/auth";
 import { useThemeStore } from "./stores/theme";
 import { useAiStore } from "./stores/ai";
+import { useSettingsStore } from "./stores/settings";
 import AuthDialog from "./components/AuthDialog.vue";
 import SettingsDialog from "./components/SettingsDialog.vue";
 import AboutDialog from "./components/AboutDialog.vue";
@@ -228,6 +229,7 @@ const fundStore = useFundStore();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const aiStore = useAiStore();
+const settingsStore = useSettingsStore();
 const { isMobile } = useBreakpoint();
 const activeKey = ref<string>("gold");
 const collapsed = ref(false);
@@ -240,7 +242,9 @@ let timer: ReturnType<typeof setInterval> | null = null;
 
 // 设置区域菜单状态
 const isInSettingsArea = computed(() => {
-  return ["profile", "settings", "notifications"].includes(activeKey.value);
+  return ["profile", "settings", "notifications", "feature-control"].includes(
+    activeKey.value,
+  );
 });
 
 const isFundDetailPage = computed(() => route.path.startsWith("/fund/"));
@@ -349,70 +353,92 @@ const renderLabelWithLock = (label: string, requiresAuth: boolean) => {
   return label;
 };
 
-const menuOptions = computed<MenuOption[]>(() => [
-  { label: "黄金行情", key: "gold", icon: renderIcon(FlashOutline) },
-  { label: "股票行情", key: "stock", icon: renderIcon(TrendingUpOutline) },
-  { label: "基金排行", key: "fund", icon: renderIcon(WalletOutline) },
-  {
-    label: renderLabelWithLock("认知学习", true),
-    key: "learn",
-    icon: renderIcon(BookOutline),
-  },
-  {
-    label: renderLabelWithLock("AI 分析", true),
-    key: "ai",
-    icon: renderIcon(SparklesOutline),
-    children: [
-      {
-        label: "新建对话",
-        key: "ai-new",
-        icon: renderIcon(AddOutline),
-      },
-      ...aiStore.sortedConversations.map((conv) => ({
-        label: () =>
-          h(
-            "div",
-            {
-              style:
-                "display:flex;align-items:center;justify-content:space-between;width:100%;gap:4px",
-              onClick: (e: MouseEvent) => {
-                e.stopPropagation();
+const menuOptions = computed<MenuOption[]>(() => {
+  const visibleKeys = new Set(
+    settingsStore.sortedMenuItems
+      .filter((m: { visible: boolean; key: string }) => m.visible)
+      .map((m: { key: string }) => m.key),
+  );
+  const orderMap = new Map(
+    settingsStore.sortedMenuItems.map(
+      (m: { key: string; order: number }) =>
+        [m.key, m.order] as [string, number],
+    ),
+  );
+
+  const allItems: MenuOption[] = [
+    { label: "黄金行情", key: "gold", icon: renderIcon(FlashOutline) },
+    { label: "股票行情", key: "stock", icon: renderIcon(TrendingUpOutline) },
+    { label: "基金排行", key: "fund", icon: renderIcon(WalletOutline) },
+    {
+      label: renderLabelWithLock("认知学习", true),
+      key: "learn",
+      icon: renderIcon(BookOutline),
+    },
+    {
+      label: renderLabelWithLock("AI 分析", true),
+      key: "ai",
+      icon: renderIcon(SparklesOutline),
+      children: [
+        {
+          label: "新建对话",
+          key: "ai-new",
+          icon: renderIcon(AddOutline),
+        },
+        ...aiStore.sortedConversations.map((conv) => ({
+          label: () =>
+            h(
+              "div",
+              {
+                style:
+                  "display:flex;align-items:center;justify-content:space-between;width:100%;gap:4px",
+                onClick: (e: MouseEvent) => {
+                  e.stopPropagation();
+                },
               },
-            },
-            [
-              h(
-                "span",
-                {
-                  style:
-                    "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0",
-                  onClick: () => {
-                    aiStore.switchConversation(conv.id);
-                    router.push(`/ai/${conv.id}`);
+              [
+                h(
+                  "span",
+                  {
+                    style:
+                      "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0",
+                    onClick: () => {
+                      aiStore.switchConversation(conv.id);
+                      router.push(`/ai/${conv.id}`);
+                    },
                   },
-                },
-                conv.title,
-              ),
-              h(
-                NIcon,
-                {
-                  size: 14,
-                  color: "var(--text-muted)",
-                  style: "flex-shrink:0;cursor:pointer;",
-                  onClick: (e: MouseEvent) => {
-                    e.stopPropagation();
-                    aiStore.deleteConversation(conv.id);
+                  conv.title,
+                ),
+                h(
+                  NIcon,
+                  {
+                    size: 14,
+                    color: "var(--text-muted)",
+                    style: "flex-shrink:0;cursor:pointer;",
+                    onClick: (e: MouseEvent) => {
+                      e.stopPropagation();
+                      aiStore.deleteConversation(conv.id);
+                    },
                   },
-                },
-                { default: () => h(CloseOutline) },
-              ),
-            ],
-          ),
-        key: `ai-conv-${conv.id}`,
-        icon: renderIcon(ChatbubbleOutline),
-      })),
-    ],
-  },
-]);
+                  { default: () => h(CloseOutline) },
+                ),
+              ],
+            ),
+          key: `ai-conv-${conv.id}`,
+          icon: renderIcon(ChatbubbleOutline),
+        })),
+      ],
+    },
+  ];
+
+  return allItems
+    .filter((item) => visibleKeys.has(item.key as string))
+    .sort(
+      (a, b) =>
+        (orderMap.get(a.key as string) ?? 99) -
+        (orderMap.get(b.key as string) ?? 99),
+    );
+});
 
 // 设置区域菜单
 const settingsMenuOptions = computed<MenuOption[]>(() => [
@@ -422,6 +448,11 @@ const settingsMenuOptions = computed<MenuOption[]>(() => [
     label: "推送通知",
     key: "notifications",
     icon: renderIcon(NotificationsOutline),
+  },
+  {
+    label: "功能控制",
+    key: "feature-control",
+    icon: renderIcon(SettingsOutline),
   },
 ]);
 
@@ -472,6 +503,7 @@ const titleMap: Record<string, string> = {
   learn: "认知学习",
   ai: "AI 分析",
   profile: "个人中心",
+  "feature-control": "功能控制",
 };
 
 const currentTitle = computed(() => {
@@ -536,6 +568,7 @@ watch(
         "profile",
         "settings",
         "notifications",
+        "feature-control",
       ].includes(key)
     ) {
       activeKey.value = key;

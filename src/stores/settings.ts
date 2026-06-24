@@ -1,8 +1,17 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { ModelProvider, ModelSettings, ModelOption, ProviderConfig } from "../types";
+import type { ModelProvider, ModelSettings, ModelOption, ProviderConfig, MenuItemConfig } from "../types";
 
 const SETTINGS_KEY = "openqmt_model_settings";
+const MENU_SETTINGS_KEY = "openqmt_menu_settings";
+
+export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
+  { key: "gold", label: "黄金行情", visible: true, order: 0 },
+  { key: "stock", label: "股票行情", visible: true, order: 1 },
+  { key: "fund", label: "基金排行", visible: true, order: 2 },
+  { key: "learn", label: "认知学习", visible: true, order: 3 },
+  { key: "ai", label: "AI 分析", visible: true, order: 4 },
+];
 
 export const PROVIDER_LABELS: Record<ModelProvider, string> = {
   openai: "OpenAI",
@@ -237,6 +246,62 @@ export const useSettingsStore = defineStore("settings", () => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(model.value));
   }
 
+  // ── 菜单配置 ──
+  function loadMenuConfig(): MenuItemConfig[] {
+    try {
+      const raw = localStorage.getItem(MENU_SETTINGS_KEY);
+      if (!raw) return DEFAULT_MENU_ITEMS.map(m => ({ ...m }));
+      const saved = JSON.parse(raw) as MenuItemConfig[];
+      // Merge: add new items, remove obsolete items
+      const savedKeys = new Set(saved.map(m => m.key));
+      const result: MenuItemConfig[] = saved.map(m => ({ ...m }));
+      for (const def of DEFAULT_MENU_ITEMS) {
+        if (!savedKeys.has(def.key)) {
+          result.push({ ...def, order: result.length });
+        }
+      }
+      return result.filter(m => DEFAULT_MENU_ITEMS.some(d => d.key === m.key));
+    } catch {
+      return DEFAULT_MENU_ITEMS.map(m => ({ ...m }));
+    }
+  }
+
+  const menuConfig = ref<MenuItemConfig[]>(loadMenuConfig());
+
+  const sortedMenuItems = computed(() =>
+    [...menuConfig.value].sort((a, b) => a.order - b.order)
+  );
+
+  function toggleMenuItem(key: string) {
+    const item = menuConfig.value.find(m => m.key === key);
+    if (item) item.visible = !item.visible;
+    saveMenuConfig();
+  }
+
+  function moveMenuItem(key: string, direction: 'up' | 'down') {
+    const sorted = sortedMenuItems.value;
+    const idx = sorted.findIndex(m => m.key === key);
+    if (idx < 0) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+    // Swap order values
+    const a = menuConfig.value.find(m => m.key === sorted[idx].key)!;
+    const b = menuConfig.value.find(m => m.key === sorted[swapIdx].key)!;
+    const tmpOrder = a.order;
+    a.order = b.order;
+    b.order = tmpOrder;
+    saveMenuConfig();
+  }
+
+  function saveMenuConfig() {
+    localStorage.setItem(MENU_SETTINGS_KEY, JSON.stringify(menuConfig.value));
+  }
+
+  function resetMenuConfig() {
+    menuConfig.value = DEFAULT_MENU_ITEMS.map(m => ({ ...m }));
+    saveMenuConfig();
+  }
+
   return {
     model,
     providerLabel,
@@ -251,5 +316,10 @@ export const useSettingsStore = defineStore("settings", () => {
     save,
     saveCurrentConfig,
     reset,
+    menuConfig,
+    sortedMenuItems,
+    toggleMenuItem,
+    moveMenuItem,
+    resetMenuConfig,
   };
 });

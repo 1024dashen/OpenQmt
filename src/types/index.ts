@@ -281,3 +281,11 @@ export interface PushNotificationSettings {
     channels: PushChannelConfig[]
     notifications: NotificationTypeConfig[]
 }
+
+/** 菜单项配置 */
+export interface MenuItemConfig {
+    key: string
+    label: string
+    visible: boolean
+    order: number
+}

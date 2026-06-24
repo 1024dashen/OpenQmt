@@ -72,6 +72,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import("../pages/NotificationsPage.vue"),
     meta: { title: "推送通知", requiresAuth: true },
   },
+  {
+    path: "/feature-control",
+    name: "FeatureControl",
+    component: () => import("../pages/FeatureControlPage.vue"),
+    meta: { title: "功能控制", requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
