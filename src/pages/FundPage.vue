@@ -108,7 +108,11 @@ const columns: DataTableColumns<FundRankItem> = [
                 'span',
                 {
                     class: 'num-mono',
-                    style: { color: 'rgba(212,168,67,0.7)', fontSize: '12px' },
+                    style: {
+                        color: 'rgba(212,168,67)',
+                        fontWeight: '700',
+                        fontSize: '12px',
+                    },
                 },
                 row.code,
             )
