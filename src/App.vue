@@ -531,6 +531,8 @@ const titleMap: Record<string, string> = {
   learn: "认知学习",
   ai: "AI 分析",
   profile: "个人中心",
+  settings: "模型设置",
+  notifications: "推送通知",
   "feature-control": "功能控制",
 };
 

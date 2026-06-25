@@ -1,9 +1,9 @@
 <template>
   <div class="notifications-page">
-    <div class="notifications-header">
+    <!-- <div class="notifications-header">
       <h2 class="page-title">推送通知</h2>
       <p class="page-subtitle">管理您的通知偏好和推送设置</p>
-    </div>
+    </div> -->
 
     <div class="notifications-container">
       <!-- 推送渠道配置 -->
@@ -343,7 +343,7 @@ function handleReset() {
 }
 
 .notifications-header {
-  margin-bottom: 24px;
+  margin-bottom: 4px;
 }
 
 .page-title {

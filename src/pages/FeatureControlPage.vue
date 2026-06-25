@@ -1,11 +1,11 @@
 <template>
   <div class="feature-control-page">
-    <div class="fc-header">
+    <!-- <div class="fc-header">
       <h2 class="page-title">功能控制</h2>
       <p class="page-subtitle">
         控制主页菜单的显示和排序，隐藏的菜单仍可通过设置区域访问
       </p>
-    </div>
+    </div> -->
 
     <div class="fc-container">
       <div class="settings-card surface-card surface-card--flat">
