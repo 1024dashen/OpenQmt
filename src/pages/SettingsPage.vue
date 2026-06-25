@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page">
     <div class="settings-header">
-      <h2 class="page-title">系统设置</h2>
+      <h2 class="page-title">模型配置</h2>
       <p class="page-subtitle">配置 AI 分析使用的模型和提示词</p>
     </div>
 

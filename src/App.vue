@@ -471,7 +471,7 @@ const menuOptions = computed<MenuOption[]>(() => {
 // 设置区域菜单
 const settingsMenuOptions = computed<MenuOption[]>(() => [
   { label: "个人中心", key: "profile", icon: renderIcon(PersonOutline) },
-  { label: "系统设置", key: "settings", icon: renderIcon(SettingsOutline) },
+  { label: "模型配置", key: "settings", icon: renderIcon(SettingsOutline) },
   {
     label: "推送通知",
     key: "notifications",

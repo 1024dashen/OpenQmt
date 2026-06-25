@@ -7,7 +7,7 @@
   >
     <div class="settings-dialog">
       <div class="settings-header">
-        <h2 class="settings-title">系统设置</h2>
+        <h2 class="settings-title">模型配置</h2>
         <p class="settings-subtitle">配置 AI 分析使用的模型提供商</p>
       </div>
 
