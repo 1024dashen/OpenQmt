@@ -66,6 +66,18 @@
               </n-button>
               <span class="header-title">{{ currentTitle }}</span>
               <PageToolbar v-if="showPageToolbar" />
+              <n-input
+                v-if="showSearchBox"
+                v-model:value="searchQuery"
+                :placeholder="searchPlaceholder"
+                size="small"
+                clearable
+                class="header-search-input"
+              >
+                <template #prefix>
+                  <n-icon :component="SearchOutline" />
+                </template>
+              </n-input>
             </div>
             <div class="header-right">
               <span
@@ -198,7 +210,7 @@
 <script setup lang="ts">
 import { ref, computed, h, onMounted, onUnmounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import { darkTheme, NIcon, type GlobalThemeOverrides } from "naive-ui";
+import { darkTheme, NIcon, NInput, type GlobalThemeOverrides } from "naive-ui";
 import type { MenuOption, DropdownOption } from "naive-ui";
 import {
   FlashOutline,
@@ -221,6 +233,7 @@ import {
   AddOutline,
   CloseOutline,
   ChatbubbleOutline,
+  SearchOutline,
 } from "@vicons/ionicons5";
 import router from "./router";
 import { useBreakpoint } from "./composables/useBreakpoint";
@@ -553,6 +566,20 @@ const showPageToolbar = computed(() => {
   return ["gold", "stock", "fund", "learn", "ai"].includes(activeKey.value);
 });
 
+// ── 搜索框 ──
+const searchQuery = ref("");
+const showSearchBox = computed(() =>
+  ["gold", "stock", "fund"].includes(activeKey.value),
+);
+const searchPlaceholder = computed(() => {
+  const map: Record<string, string> = {
+    gold: "搜索黄金品种...",
+    stock: "搜索股票/指数...",
+    fund: "搜索基金...",
+  };
+  return map[activeKey.value] || "搜索...";
+});
+
 const updateTime = () => {
   const now = new Date();
   currentTime.value = now.toLocaleString("zh-CN", {
@@ -602,6 +629,8 @@ watch(
 );
 
 watch(activeKey, (key) => {
+  // 切换页面时清空搜索
+  searchQuery.value = "";
   // AI 子菜单的特殊处理
   if (key === "ai-new") {
     aiStore.currentConversationId = null;
@@ -771,8 +800,23 @@ onUnmounted(() => {
 
 .header-left :deep(.header-toolbar) {
   margin-left: 4px;
-  flex: 1;
+  /* flex: 1; */
   min-width: 0;
+}
+
+.header-search-input {
+  width: 180px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-search-input {
+    width: 140px;
+  }
+}
+
+.header-search-input :deep(.n-input) {
+  border-radius: 20px !important;
 }
 
 .back-btn {
