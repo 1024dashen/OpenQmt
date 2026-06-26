@@ -476,8 +476,10 @@ export async function fetchFundDetail(fcode: string): Promise<FundDetail> {
             for (const h of detail.holdings) {
                 const q = quoteMap.get(h.code)
                 if (q) {
-                    h.price = q.f2
-                    h.changePercent = q.f3
+                    const p = Number(q.f2)
+                    h.price = Number.isFinite(p) ? p : null
+                    const c = Number(q.f3)
+                    h.changePercent = Number.isFinite(c) ? c : null
                 }
             }
         } catch (error) {
