@@ -40,7 +40,10 @@
               <n-button
                 v-if="
                   !isMobile &&
-                  (isInSettingsArea || isFundDetailPage || isStockDetailPage || isStockInfoPage)
+                  (isInSettingsArea ||
+                    isFundDetailPage ||
+                    isStockDetailPage ||
+                    isStockInfoPage)
                 "
                 quaternary
                 circle
@@ -586,7 +589,12 @@ const currentTitle = computed(() => {
 });
 
 const showPageToolbar = computed(() => {
-  if (isFundDetailPage.value || isStockDetailPage.value || isStockInfoPage.value) return false;
+  if (
+    isFundDetailPage.value ||
+    isStockDetailPage.value ||
+    isStockInfoPage.value
+  )
+    return false;
   return ["gold", "stock", "fund", "learn", "ai"].includes(activeKey.value);
 });
 
