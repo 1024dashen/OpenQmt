@@ -141,19 +141,10 @@
 
       <!-- 五维评分 -->
       <div class="score-list">
-        <div v-for="s in scoreItems" :key="s.label" class="score-row">
+        <div v-for="s in scoreItems" :key="s.label" class="score-item">
           <span class="score-label">{{ s.label }}</span>
-          <div class="score-bar-wrap">
-            <div class="score-bar" :style="{ width: s.score + '%' }"></div>
-          </div>
-          <span class="score-num num-mono">{{ s.score }}</span>
-        </div>
-        <div
-          v-for="s in scoreItems"
-          :key="s.label + '-desc'"
-          class="score-desc"
-        >
-          <strong>{{ s.label }}：</strong>{{ s.desc }}
+          <span class="score-val num-mono">{{ s.score }}</span>
+          <span class="score-desc">{{ s.desc }}</span>
         </div>
       </div>
     </div>
@@ -559,43 +550,29 @@ function fmtAmt(v: number): string {
 .score-list {
   margin-top: 16px;
 }
-.score-row {
+.score-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 .score-label {
-  width: 48px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   flex-shrink: 0;
-}
-.score-bar-wrap {
-  flex: 1;
-  height: 6px;
-  background: var(--surface-muted);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.score-bar {
-  height: 100%;
-  border-radius: 3px;
-  background: var(--gold-primary);
-  transition: width 0.4s ease;
-}
-.score-num {
-  width: 28px;
-  text-align: center;
-  font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+}
+.score-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold-primary);
+  flex-shrink: 0;
 }
 .score-desc {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.6;
-  margin: 4px 0 10px 0;
 }
 
 /* ── 公司概要 ── */
@@ -728,9 +705,6 @@ function fmtAmt(v: number): string {
   .trend-row {
     flex-wrap: wrap;
     gap: 12px;
-  }
-  .score-desc {
-    margin-left: 0;
   }
   .profit-chart {
     height: 140px;
