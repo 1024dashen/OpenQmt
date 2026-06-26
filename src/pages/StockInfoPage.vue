@@ -586,7 +586,7 @@ function fmtAmt(v: number): string {
 }
 .score-num {
   width: 28px;
-  text-align: right;
+  text-align: center;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
@@ -595,7 +595,7 @@ function fmtAmt(v: number): string {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.6;
-  margin: 4px 0 10px 58px;
+  margin: 4px 0 10px 0;
 }
 
 /* ── 公司概要 ── */

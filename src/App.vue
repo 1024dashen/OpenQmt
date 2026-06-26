@@ -40,7 +40,7 @@
               <n-button
                 v-if="
                   !isMobile &&
-                  (isInSettingsArea || isFundDetailPage || isStockDetailPage)
+                  (isInSettingsArea || isFundDetailPage || isStockDetailPage || isStockInfoPage)
                 "
                 quaternary
                 circle
@@ -306,6 +306,7 @@ const isInSettingsArea = computed(() => {
 
 const isFundDetailPage = computed(() => route.path.startsWith("/fund/"));
 const isStockDetailPage = computed(() => route.path.startsWith("/stock/"));
+const isStockInfoPage = computed(() => route.path.startsWith("/stock-info/"));
 
 // ── Naive UI 主题 ──
 const naiveTheme = computed(() => (themeStore.isDark ? darkTheme : null));
@@ -550,7 +551,7 @@ function handleBack() {
     router.push("/fund");
     return;
   }
-  if (isStockDetailPage.value) {
+  if (isStockDetailPage.value || isStockInfoPage.value) {
     router.push("/stock");
     return;
   }
@@ -574,6 +575,9 @@ const currentTitle = computed(() => {
     const name = route.query.name;
     return typeof name === "string" && name ? name : "基金详情";
   }
+  if (isStockInfoPage.value) {
+    return "个股详情";
+  }
   if (isStockDetailPage.value) {
     const name = route.query.name;
     return typeof name === "string" && name ? name : "大盘详情";
@@ -582,7 +586,7 @@ const currentTitle = computed(() => {
 });
 
 const showPageToolbar = computed(() => {
-  if (isFundDetailPage.value || isStockDetailPage.value) return false;
+  if (isFundDetailPage.value || isStockDetailPage.value || isStockInfoPage.value) return false;
   return ["gold", "stock", "fund", "learn", "ai"].includes(activeKey.value);
 });
 
@@ -636,7 +640,7 @@ watch(
       activeKey.value = "fund";
       return;
     }
-    if (path.startsWith("/stock/")) {
+    if (path.startsWith("/stock/") || path.startsWith("/stock-info/")) {
       activeKey.value = "stock";
       return;
     }
