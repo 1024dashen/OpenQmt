@@ -9,7 +9,7 @@
             <!-- Header -->
             <div class="auth-header">
                 <div class="auth-logo">
-                    <span class="auth-logo-letter">Q</span>
+                    <img class="logo-icon" :src="logoImg" alt="logo" />
                 </div>
                 <h2 class="auth-title">OpenQmt</h2>
             </div>
@@ -63,13 +63,7 @@
                 <!-- Divider -->
                 <div class="auth-divider">
                     <span class="auth-divider-line" />
-                    <p class="auth-hint">
-                        <n-icon
-                            :component="InformationCircleOutline"
-                            class="hint-icon"
-                        />
-                        账号不存在时将自动注册
-                    </p>
+                    <p class="auth-hint">账号不存在时将自动注册</p>
                     <span class="auth-divider-line" />
                 </div>
 
@@ -135,11 +129,8 @@
 import { ref, reactive } from 'vue'
 import { NModal, NInput, NButton, NIcon, useMessage } from 'naive-ui'
 import { useAuthStore } from '../stores/auth'
-import {
-    LockClosedOutline,
-    MailOutline,
-    InformationCircleOutline,
-} from '@vicons/ionicons5'
+import { LockClosedOutline, MailOutline } from '@vicons/ionicons5'
+import logoImg from '@/assets/images/logo.png'
 
 const props = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ 'update:show': [value: boolean] }>()
@@ -248,11 +239,18 @@ function resetForm() {
     width: 52px;
     height: 52px;
     border-radius: var(--radius-md);
-    background: var(--gold-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 12px;
+    margin: 0 auto;
+}
+
+.logo-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .auth-logo-letter {
@@ -363,11 +361,6 @@ function resetForm() {
     gap: 4px;
     font-size: 12px;
     color: var(--text-muted);
-}
-
-.hint-icon {
-    font-size: 14px;
-    vertical-align: middle;
 }
 
 /* Footer */

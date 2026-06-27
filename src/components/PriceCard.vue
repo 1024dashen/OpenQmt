@@ -80,17 +80,19 @@
                     >
                 </div>
                 <div class="footer-item">
-                    <span class="footer-label" :title="passionTempIntro"
-                        >温度</span
-                    >
+                    <span class="footer-label" :title="passionTempIntro">
+                        温度
+                    </span>
                     <span
                         class="footer-value"
                         :class="passionLevel(passionTemp)"
                         :title="passionTempIntro"
-                        >{{ passionTemp }}°<span class="footer-desc"
-                            >({{ tempDesc(passionTemp) }})</span
-                        ></span
                     >
+                        {{ passionTemp }}°
+                        <span class="footer-desc">
+                            ({{ tempDesc(passionTemp) }})
+                        </span>
+                    </span>
                 </div>
             </div>
         </div>
