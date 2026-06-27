@@ -43,7 +43,8 @@
                                     (isInSettingsArea ||
                                         isFundDetailPage ||
                                         isStockDetailPage ||
-                                        isStockInfoPage)
+                                        isStockInfoPage ||
+                                        isSectorDetailPage)
                                 "
                                 quaternary
                                 circle
@@ -323,6 +324,7 @@ const isInSettingsArea = computed(() => {
 const isFundDetailPage = computed(() => route.path.startsWith('/fund/'))
 const isStockDetailPage = computed(() => route.path.startsWith('/stock/'))
 const isStockInfoPage = computed(() => route.path.startsWith('/stock-info/'))
+const isSectorDetailPage = computed(() => route.path.startsWith('/sector/'))
 
 // ── Naive UI 主题 ──
 const naiveTheme = computed(() => (themeStore.isDark ? darkTheme : null))
@@ -569,6 +571,10 @@ function handleBack() {
         router.push('/stock')
         return
     }
+    if (isSectorDetailPage.value) {
+        router.back()
+        return
+    }
     backToMain()
 }
 
@@ -596,6 +602,9 @@ const currentTitle = computed(() => {
         const name = route.query.name
         return typeof name === 'string' && name ? name : '大盘详情'
     }
+    if (isSectorDetailPage.value) {
+        return decodeURIComponent(String(route.params.name ?? '板块详情'))
+    }
     return titleMap[activeKey.value] || '个人中心'
 })
 
@@ -603,7 +612,8 @@ const showPageToolbar = computed(() => {
     if (
         isFundDetailPage.value ||
         isStockDetailPage.value ||
-        isStockInfoPage.value
+        isStockInfoPage.value ||
+        isSectorDetailPage.value
     )
         return false
     return ['gold', 'stock', 'fund', 'learn', 'ai'].includes(activeKey.value)
@@ -660,6 +670,10 @@ watch(
             return
         }
         if (path.startsWith('/stock/') || path.startsWith('/stock-info/')) {
+            activeKey.value = 'stock'
+            return
+        }
+        if (path.startsWith('/sector/')) {
             activeKey.value = 'stock'
             return
         }
