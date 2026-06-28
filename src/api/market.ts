@@ -1,6 +1,6 @@
 /**
  * OpenQmt 行情数据 API 模块
- * 黄金/股票行情：使用 Yun API 获取实时数据
+ * 黄金/股市行情：使用 Yun API 获取实时数据
  * 基金排行：使用天天基金条件选基 API
  */
 
@@ -168,7 +168,6 @@ const MOCK_STOCK: StockDataMap = {
     },
 }
 
-
 // ============ 工具函数 ============
 
 /** 将 yun API 单项数据转为 QuoteData */
@@ -281,7 +280,7 @@ export async function fetchStockData(): Promise<StockFetchResult> {
 
         return { data: results, isWeekend: raw.isWeekend ?? false }
     } catch (e) {
-        console.warn('获取股票行情失败:', e)
+        console.warn('获取股市行情失败:', e)
         return { data: { ...MOCK_STOCK }, isWeekend: false }
     }
 }

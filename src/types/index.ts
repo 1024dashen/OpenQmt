@@ -47,7 +47,7 @@ export interface GoldApiResponse {
 /** 股票指数 key */
 export type StockKey = 'sh' | 'cy' | 'hk' | 'us'
 
-/** 股票行情单项（yun API 响应字段） */
+/** 股市行情单项（yun API 响应字段） */
 export interface StockPriceItem {
     name: string
     price: number
@@ -60,7 +60,7 @@ export interface StockPriceItem {
     time: number | string
 }
 
-/** 股票行情 API 响应 */
+/** 股市行情 API 响应 */
 export interface StockApiResponse {
     shIndex: StockPriceItem
     cyIndex: StockPriceItem
@@ -78,10 +78,10 @@ export interface GoldFetchResult {
     isWeekend: boolean
 }
 
-/** 股票行情数据映射 */
+/** 股市行情数据映射 */
 export type StockDataMap = Partial<Record<StockKey, QuoteData>>
 
-/** 股票行情获取结果 */
+/** 股市行情获取结果 */
 export interface StockFetchResult {
     data: StockDataMap
     isWeekend: boolean

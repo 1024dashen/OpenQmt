@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
         path: '/stock',
         name: 'Stock',
         component: () => import('../pages/StockPage.vue'),
-        meta: { title: '股票行情' },
+        meta: { title: '股市行情' },
     },
     {
         path: '/stock/:key',

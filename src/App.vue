@@ -445,7 +445,7 @@ const menuOptions = computed<MenuOption[]>(() => {
     const allItems: MenuOption[] = [
         { label: '黄金行情', key: 'gold', icon: renderIcon(FlashOutline) },
         {
-            label: '股票行情',
+            label: '股市行情',
             key: 'stock',
             icon: renderIcon(TrendingUpOutline),
         },
@@ -568,7 +568,7 @@ function handleBack() {
 
 const titleMap: Record<string, string> = {
     gold: '黄金行情',
-    stock: '股票行情',
+    stock: '股市行情',
     fund: '基金排行',
     learn: '认知学习',
     ai: 'AI 分析',

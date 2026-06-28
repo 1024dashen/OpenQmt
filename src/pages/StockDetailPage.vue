@@ -110,7 +110,7 @@
             v-else
             status="404"
             title="未找到该指数"
-            description="请从股票行情页选择有效的大盘指数"
+            description="请从股市行情页选择有效的大盘指数"
         >
             <template #footer>
                 <n-button type="primary" @click="router.push('/stock')"
