@@ -35,6 +35,20 @@ export const FUND_YIELD_COLUMNS: Array<{ key: string; label: string }> = [
     { key: 'incepChange', label: '成立来' },
 ]
 
+/** 默认仅展示：日涨跌、近一周、近一月、近三月、近六月 */
+const DEFAULT_FUND_COLUMNS: Record<string, boolean> = {
+    dayChange: true,
+    weekChange: true,
+    monthChange: true,
+    threeMonthChange: true,
+    sixMonthChange: true,
+    thisYearChange: false,
+    yearChange: false,
+    twoYearChange: false,
+    threeYearChange: false,
+    incepChange: false,
+}
+
 export const PROVIDER_LABELS: Record<ModelProvider, string> = {
     openai: 'OpenAI',
     anthropic: 'Anthropic',
@@ -367,18 +381,19 @@ export const useSettingsStore = defineStore('settings', () => {
     // ── 基金收益率列配置 ──
     function loadFundColumns(): Record<string, boolean> {
         try {
-            const saved = storage.getSync<Record<string, boolean>>(FUND_COLUMNS_KEY)
+            const saved =
+                storage.getSync<Record<string, boolean>>(FUND_COLUMNS_KEY)
             if (saved && typeof saved === 'object') {
-                // 合并默认值，确保新增字段默认为 true
+                // 合并默认值，确保新增字段使用 DEFAULT_FUND_COLUMNS 中的默认值
                 const result: Record<string, boolean> = {}
                 for (const col of FUND_YIELD_COLUMNS) {
-                    result[col.key] = saved[col.key] ?? true
+                    result[col.key] =
+                        saved[col.key] ?? DEFAULT_FUND_COLUMNS[col.key] ?? false
                 }
                 return result
             }
         } catch {}
-        // 默认全部显示
-        return Object.fromEntries(FUND_YIELD_COLUMNS.map((c) => [c.key, true]))
+        return { ...DEFAULT_FUND_COLUMNS }
     }
 
     const fundColumns = ref<Record<string, boolean>>(loadFundColumns())
@@ -389,9 +404,7 @@ export const useSettingsStore = defineStore('settings', () => {
     }
 
     function resetFundColumns() {
-        fundColumns.value = Object.fromEntries(
-            FUND_YIELD_COLUMNS.map((c) => [c.key, true]),
-        )
+        fundColumns.value = { ...DEFAULT_FUND_COLUMNS }
         saveFundColumns()
     }
 
