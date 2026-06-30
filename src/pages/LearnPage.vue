@@ -594,7 +594,7 @@ watch(showVideo, async (open) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
