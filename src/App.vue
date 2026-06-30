@@ -745,6 +745,7 @@ onUnmounted(() => {
   background: var(--bg-sidebar) !important;
   border-right: 1px solid var(--sidebar-border);
   transition: background 0.3s ease;
+  user-select: none !important;
 }
 
 .app-sidebar :deep(.n-layout-toggle-button) {
