@@ -96,6 +96,32 @@
         </div>
       </div>
 
+      <div class="settings-card surface-card surface-card--flat">
+        <div class="card-header">
+          <n-icon size="20" color="var(--gold-primary)">
+            <BookOutline />
+          </n-icon>
+          <span class="card-title">认知学习布局</span>
+        </div>
+        <div class="card-body">
+          <div class="layout-options">
+            <button
+              v-for="opt in learnLayoutOptions"
+              :key="opt.value"
+              class="layout-option-btn"
+              :class="{
+                'layout-option-btn--active':
+                  settingsStore.learnLayout === opt.value,
+              }"
+              @click="settingsStore.setLearnLayout(opt.value)"
+            >
+              <n-icon :size="18"><component :is="opt.icon" /></n-icon>
+              <span>{{ opt.label }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="fc-actions">
         <n-button quaternary @click="resetAll">恢复默认</n-button>
       </div>
@@ -111,14 +137,34 @@ import {
   ChevronUpOutline,
   ChevronDownOutline,
   TrendingUpOutline,
+  BookOutline,
+  AppsOutline,
+  ListOutline,
+  CopyOutline,
+  DocumentTextOutline,
 } from "@vicons/ionicons5";
-import { useSettingsStore, FUND_YIELD_COLUMNS } from "../stores/settings";
+import {
+  useSettingsStore,
+  FUND_YIELD_COLUMNS,
+  type LearnLayout,
+} from "../stores/settings";
 
 const settingsStore = useSettingsStore();
 const message = useMessage();
 
 const sortedMenuItems = computed(() => settingsStore.sortedMenuItems);
 const fundYieldColumns = FUND_YIELD_COLUMNS;
+
+const learnLayoutOptions: Array<{
+  value: LearnLayout;
+  label: string;
+  icon: any;
+}> = [
+  { value: "masonry", label: "瀑布流", icon: AppsOutline },
+  { value: "list", label: "列表", icon: ListOutline },
+  { value: "card", label: "卡片", icon: CopyOutline },
+  { value: "compact", label: "无图列表", icon: DocumentTextOutline },
+];
 
 function toggleMenuItem(key: string) {
   settingsStore.toggleMenuItem(key);
@@ -131,6 +177,7 @@ function moveMenuItem(key: string, direction: "up" | "down") {
 function resetAll() {
   settingsStore.resetMenuConfig();
   settingsStore.resetFundColumns();
+  settingsStore.resetLearnLayout();
   message.success("已恢复默认配置");
 }
 </script>
@@ -271,9 +318,48 @@ function resetAll() {
   color: var(--text-muted);
 }
 
+.layout-options {
+  display: flex;
+  gap: 12px;
+}
+
+.layout-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.layout-option-btn:hover {
+  background: var(--user-hover-bg);
+  color: var(--text-primary);
+}
+
+.layout-option-btn--active {
+  border-color: var(--gold-primary);
+  background: rgba(212, 168, 67, 0.08);
+  color: var(--gold-primary);
+}
+
+.layout-option-btn--active:hover {
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--gold-primary);
+}
+
 @media (max-width: 768px) {
   .settings-card {
     padding: 18px;
+  }
+  .layout-options {
+    flex-direction: column;
   }
 }
 </style>

@@ -1,6 +1,11 @@
 <template>
   <div class="learn-page">
-    <div class="feed-masonry" :style="{ columnCount: columnCount }">
+    <!-- 瀑布流布局 -->
+    <div
+      v-if="layout === 'masonry'"
+      class="feed-masonry"
+      :style="{ columnCount: columnCount }"
+    >
       <div
         v-for="post in filteredPosts"
         :key="post.id"
@@ -32,6 +37,115 @@
               <n-icon :size="13">
                 <HeartOutline />
               </n-icon>
+              {{ formatLikes(post.likes) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 列表布局 -->
+    <div v-else-if="layout === 'list'" class="feed-list">
+      <div
+        v-for="post in filteredPosts"
+        :key="post.id"
+        class="feed-list-item surface-card surface-card--interactive"
+        @click="openPost(post)"
+      >
+        <div class="feed-list-thumb">
+          <img
+            :src="post.cover"
+            :alt="post.title"
+            class="feed-list-thumb-img"
+            loading="lazy"
+          />
+          <span class="feed-level" :class="`badge-${post.level}`">{{
+            post.level
+          }}</span>
+          <div v-if="post.type === 'video'" class="feed-video-badge">
+            <n-icon :size="14" color="#fff">
+              <Play />
+            </n-icon>
+            <span>{{ post.duration }}</span>
+          </div>
+        </div>
+        <div class="feed-list-content">
+          <p class="feed-list-title">{{ post.title }}</p>
+          <div class="feed-list-meta">
+            <span class="feed-author">{{ post.author }}</span>
+            <span class="feed-likes">
+              <n-icon :size="13">
+                <HeartOutline />
+              </n-icon>
+              {{ formatLikes(post.likes) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片布局 -->
+    <div
+      v-else-if="layout === 'card'"
+      class="feed-grid"
+      :style="{ gridTemplateColumns: gridCols }"
+    >
+      <div
+        v-for="post in filteredPosts"
+        :key="post.id"
+        class="feed-grid-card surface-card surface-card--interactive"
+        @click="openPost(post)"
+      >
+        <div class="feed-grid-cover">
+          <img
+            :src="post.cover"
+            :alt="post.title"
+            class="feed-grid-cover-img"
+            loading="lazy"
+          />
+          <span class="feed-level" :class="`badge-${post.level}`">{{
+            post.level
+          }}</span>
+          <div v-if="post.type === 'video'" class="feed-video-badge">
+            <n-icon :size="14" color="#fff">
+              <Play />
+            </n-icon>
+            <span>{{ post.duration }}</span>
+          </div>
+        </div>
+        <div class="feed-grid-body">
+          <p class="feed-grid-title">{{ post.title }}</p>
+          <div class="feed-meta">
+            <span class="feed-author">{{ post.author }}</span>
+            <span class="feed-likes">
+              <n-icon :size="13">
+                <HeartOutline />
+              </n-icon>
+              {{ formatLikes(post.likes) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 无图列表布局 -->
+    <div v-else class="feed-compact">
+      <div
+        v-for="post in filteredPosts"
+        :key="post.id"
+        class="feed-compact-item surface-card surface-card--interactive"
+        @click="openPost(post)"
+      >
+        <div class="feed-compact-body">
+          <p class="feed-compact-title">{{ post.title }}</p>
+          <div class="feed-compact-meta">
+            <span v-if="post.type === 'video'" class="feed-compact-video">
+              <n-icon :size="12"><Play /></n-icon>
+              {{ post.duration }}
+            </span>
+            <span class="feed-author">{{ post.author }}</span>
+            <span class="feed-likes">
+              <n-icon :size="12"><HeartOutline /></n-icon>
               {{ formatLikes(post.likes) }}
             </span>
           </div>
@@ -111,14 +225,27 @@ import type { LearnPost, LearnArticle, LearnVideo } from "../types";
 import { learnPosts } from "../data/learnPosts";
 import { useBreakpoint } from "../composables/useBreakpoint";
 import { useLearnStore } from "../stores/learn";
+import { useSettingsStore } from "../stores/settings";
 
 const { isMobile, isTablet } = useBreakpoint();
 const learnStore = useLearnStore();
+const settingsStore = useSettingsStore();
 
+/** 当前布局模式 */
+const layout = computed(() => settingsStore.learnLayout);
+
+/** 瀑布流列数 */
 const columnCount = computed(() => {
   if (isMobile.value) return 2;
   if (isTablet.value) return 3;
   return 4;
+});
+
+/** 卡片布局列数 */
+const gridCols = computed(() => {
+  if (isMobile.value) return "repeat(2, 1fr)";
+  if (isTablet.value) return "repeat(3, 1fr)";
+  return "repeat(4, 1fr)";
 });
 
 const videoModalWidth = computed(() =>
@@ -202,6 +329,160 @@ watch(showVideo, async (open) => {
   margin-bottom: 10px;
   overflow: hidden;
   border-radius: var(--radius-md);
+}
+
+/* ── 列表布局 ── */
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feed-list-item {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.feed-list-thumb {
+  position: relative;
+  width: 160px;
+  min-height: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.feed-list-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feed-list-content {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.feed-list-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.feed-list-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── 卡片布局 ── */
+.feed-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.feed-grid-card {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.feed-grid-cover {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.feed-grid-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.feed-grid-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feed-grid-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── 无图列表布局 ── */
+.feed-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.feed-compact-item {
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.feed-compact-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feed-compact-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.feed-compact-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.feed-level--inline {
+  position: static;
+}
+
+.feed-compact-video {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .feed-cover {
@@ -467,5 +748,25 @@ watch(showVideo, async (open) => {
 .detail-fade-enter-from,
 .detail-fade-leave-to {
   opacity: 0;
+}
+
+/* ── 移动端响应式 ── */
+@media (max-width: 768px) {
+  .feed-list-thumb {
+    width: 110px;
+    min-height: 80px;
+  }
+  .feed-list-content {
+    padding: 10px 12px;
+  }
+  .feed-list-title {
+    font-size: 13px;
+  }
+  .feed-grid-cover {
+    height: 120px;
+  }
+  .feed-grid-body {
+    padding: 10px;
+  }
 }
 </style>

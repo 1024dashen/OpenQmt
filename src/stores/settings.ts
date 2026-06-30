@@ -12,6 +12,12 @@ import * as storage from '../utils/storage'
 const SETTINGS_KEY = 'openqmt_model_settings'
 const MENU_SETTINGS_KEY = 'openqmt_menu_settings'
 const FUND_COLUMNS_KEY = 'openqmt_fund_columns'
+const LEARN_LAYOUT_KEY = 'openqmt_learn_layout'
+
+/** 认知学习页面布局模式 */
+export type LearnLayout = 'masonry' | 'list' | 'card' | 'compact'
+
+const VALID_LAYOUTS: LearnLayout[] = ['masonry', 'list', 'card', 'compact']
 
 export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
     { key: 'gold', label: '黄金行情', visible: true, order: 0 },
@@ -412,6 +418,29 @@ export const useSettingsStore = defineStore('settings', () => {
         storage.set(FUND_COLUMNS_KEY, fundColumns.value)
     }
 
+    // ── 认知学习布局 ──
+    function loadLearnLayout(): LearnLayout {
+        try {
+            const saved = storage.getSync<LearnLayout>(LEARN_LAYOUT_KEY)
+            if (saved && VALID_LAYOUTS.includes(saved)) {
+                return saved
+            }
+        } catch {}
+        return 'masonry'
+    }
+
+    const learnLayout = ref<LearnLayout>(loadLearnLayout())
+
+    function setLearnLayout(layout: LearnLayout) {
+        learnLayout.value = layout
+        storage.set(LEARN_LAYOUT_KEY, layout)
+    }
+
+    function resetLearnLayout() {
+        learnLayout.value = 'masonry'
+        storage.set(LEARN_LAYOUT_KEY, 'masonry')
+    }
+
     return {
         model,
         providerLabel,
@@ -434,5 +463,8 @@ export const useSettingsStore = defineStore('settings', () => {
         fundColumns,
         toggleFundColumn,
         resetFundColumns,
+        learnLayout,
+        setLearnLayout,
+        resetLearnLayout,
     }
 })
