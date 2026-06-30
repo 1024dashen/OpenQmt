@@ -153,14 +153,10 @@ watch(
 watch(
     pageType,
     (type) => {
-        if (!type || type === 'learn' || type === 'ai') {
-            clearTimer()
-            return
-        }
+        clearTimer()
+        if (!type || type === 'learn' || type === 'ai') return
         // 基金列表已有数据时不重新加载（keep-alive 保持状态）
-        if (type === 'fund' && fundStore.data.length > 0) {
-            return
-        }
+        if (type === 'fund' && fundStore.data.length > 0) return
         refresh()
         startAutoRefresh()
     },
