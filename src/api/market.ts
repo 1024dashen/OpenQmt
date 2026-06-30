@@ -225,7 +225,7 @@ export async function fetchGoldData(): Promise<GoldFetchResult> {
     try {
         const resp = await yunApi.getLLGold()
         const raw: GoldApiResponse = resp.data
-
+        console.log('fetchGoldData', raw)
         const results: GoldDataMap = {}
         const keyMap: Record<string, GoldKey> = {
             shjPrice: 'shj',
@@ -258,7 +258,7 @@ export async function fetchStockData(): Promise<StockFetchResult> {
     try {
         const resp = await yunApi.getQuotes()
         const raw: StockApiResponse = resp.data
-
+        console.log('fetchStockData', raw)
         const results: StockDataMap = {}
         const keyMap: Record<string, StockKey> = {
             shIndex: 'sh',
@@ -289,6 +289,7 @@ export async function fetchStockData(): Promise<StockFetchResult> {
 export async function fetchStockPassion(): Promise<PassionItem[]> {
     try {
         const resp = await yunApi.getPassion()
+        console.log('fetchStockPassion', resp.data)
         return resp.data as PassionItem[]
     } catch (e) {
         console.warn('获取股票情绪失败:', e)
