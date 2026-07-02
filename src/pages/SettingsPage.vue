@@ -71,25 +71,37 @@
                       添加模型
                     </n-button>
                   </div>
-                  <div class="models-tags">
-                    <n-tag
+                  <div class="models-list">
+                    <div
                       v-for="model in currentModels"
                       :key="model.id"
-                      :type="model.id === activeModel ? 'warning' : 'default'"
-                      :bordered="false"
-                      closable
-                      size="large"
-                      class="model-tag"
-                      @close="removeModel(model.id)"
+                      class="model-item"
+                      :class="{
+                        'model-item--active': model.id === activeModel,
+                      }"
                     >
-                      <div
-                        class="model-tag-content"
-                        @click.stop="selectModel(model.id)"
-                      >
-                        <span class="model-tag-name">{{ model.name }}</span>
-                        <span class="model-tag-id">{{ model.id }}</span>
+                      <div class="model-info" @click="selectModel(model.id)">
+                        <span class="model-name">{{ model.name }}</span>
+                        <span class="model-id">{{ model.id }}</span>
                       </div>
-                    </n-tag>
+                      <div class="model-actions">
+                        <n-switch
+                          :value="model.enabled"
+                          @update:value="toggleModelEnabled(model.id)"
+                          size="small"
+                        />
+                        <n-button
+                          quaternary
+                          circle
+                          size="tiny"
+                          @click="removeModel(model.id)"
+                        >
+                          <template #icon>
+                            <n-icon size="14"><CloseOutline /></n-icon>
+                          </template>
+                        </n-button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -236,6 +248,7 @@ import {
   AddCircleOutline,
   AddOutline,
   TrashOutline,
+  CloseOutline,
 } from "@vicons/ionicons5";
 import { useSettingsStore } from "../stores/settings";
 import type { ModelProvider, ModelOption } from "../types";
@@ -301,6 +314,10 @@ function handleAddModel() {
   newModelForm.id = "";
   newModelForm.name = "";
   message.success("模型已添加");
+}
+
+function toggleModelEnabled(modelId: string) {
+  settingsStore.toggleModel(activeProvider.value, modelId);
 }
 
 function removeModel(modelId: string) {
@@ -473,38 +490,57 @@ function handleReset() {
   color: var(--text-secondary);
 }
 
-.models-tags {
+.models-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.model-tag {
-  cursor: pointer;
+.model-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
 
-.model-tag:hover {
-  transform: translateY(-2px);
+.model-item:hover {
+  background: var(--user-hover-bg);
 }
 
-.model-tag-content {
+.model-item--active {
+  border-color: var(--gold-primary);
+  background: rgba(212, 168, 67, 0.05);
+}
+
+.model-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px 0;
-  min-width: 100px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
 }
 
-.model-tag-name {
+.model-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.model-tag-id {
+.model-id {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.model-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* 自定义提供商 */
